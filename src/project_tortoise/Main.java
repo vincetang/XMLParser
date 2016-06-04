@@ -15,7 +15,7 @@ public class Main {
 	private ArrayList<File> xmlFiles;
 	private ArrayList<File> xsdFiles;
 	
-	public boolean validateFile(String filename, String type) {
+	public boolean validateInput(String filename, String type) {
 		File f = new File(filename);
 			
 		if (f.exists() && f.isFile()) {
@@ -57,9 +57,9 @@ public class Main {
 		for (String filename: args) {
 			System.out.println("Read in file: " + filename);
 			if (filename.matches("(?i).*.xml")) {
-				m.validateFile(filename, "xml");
+				m.validateInput(filename, "xml");
 			} else if (filename.matches("(?i).*.xsd")) {
-				m.validateFile(filename,  "xsd");
+				m.validateInput(filename,  "xsd");
 			} else {
 				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml or *.xsd.");
 				
