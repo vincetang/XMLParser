@@ -43,6 +43,10 @@ public class Main {
 		}
 	}
 	
+	public static void parse(){
+		
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Main m = new Main();
