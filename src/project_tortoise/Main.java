@@ -47,14 +47,15 @@ public class Main {
 					System.out.println(xmlFile.getName() + " has been validated against " + xsdFile.getName() + " successfully.");
 					return true;
 		} catch (SAXException e) {
+			e.printStackTrace();
 			System.out.println(xmlFile.getName() + " is NOT valid when checked against " + xsdFile.getName());
 			System.out.println("Reason: " + e.getLocalizedMessage());
-			e.printStackTrace();
+	
 			return false;
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.out.println("IOException when validating " + xmlFile.getName());
 			System.out.println("Reason: " + e.getLocalizedMessage());
-			e.printStackTrace();
 			return false;
 			
 		}
