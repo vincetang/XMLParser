@@ -77,7 +77,7 @@ public class Main {
 		String xsdFileName = args[0];
 		if (xsdFileName.matches("(?i).*.xsd")) {
 			if (m.validateInput(xsdFileName,  "xsd")) {
-				System.out.println("xsd validated");
+				System.out.println("xsd found");
 			} else {
 				return;
 			}
@@ -101,6 +101,9 @@ public class Main {
 		System.out.println("xml files: " + m.xmlFiles.size());
 		System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
+		for (File f: m.xmlFiles) {
+			boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
+		}
 		return;
 	}
 
