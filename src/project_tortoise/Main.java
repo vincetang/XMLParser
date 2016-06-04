@@ -18,7 +18,7 @@ public class Main {
 	public boolean validateFile(String filename, String type) {
 		File f = new File(",/" +filename);
 			
-		if (f.exists() && !f.isDirectory()) {
+		if (f.exists()) {
 			if (type == "xml")
 				xmlFiles.add(f);
 			else
