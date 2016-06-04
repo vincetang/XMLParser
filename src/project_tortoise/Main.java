@@ -27,6 +27,8 @@ public class Main {
 				this.xmlFiles.add(f);
 			else
 				this.xsdFiles.add(f);
+
+			System.out.println("Read in file: " + filename);
 			return true;
 		} else {
 			System.out.println(filename + " not found. Omitting file.");
@@ -62,25 +64,41 @@ public class Main {
 		
 	}
 	
+	// input: Main.class schema.xsd file1.xml file2.xml...
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Main m = new Main();
 		m.xmlFiles = new ArrayList<File>();
 		m.xsdFiles = new ArrayList<File>();
 		
-		for (String filename: args) {
-			System.out.println("Read in file: " + filename);
+		if (args.length < 2) {
+			System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
+			return;
+		}
+		
+		String xsdFileName = args[0];
+		if (xsdFileName.matches("(?i).*.xsd")) {
+			m.validateInput(xsdFileName,  "xsd");
+		} else {
+			System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
+			return;
+		}
+		
+		String filename;
+		for (int i = 1; i < args.length; i++) {
+			filename = args[i];
 			if (filename.matches("(?i).*.xml")) {
 				m.validateInput(filename, "xml");
 			} else if (filename.matches("(?i).*.xsd")) {
-				m.validateInput(filename,  "xsd");
+				System.out.println("Error with " + filename + ": Only 1 xsd can be passed and must be the first argument");
 			} else {
-				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml or *.xsd.");
-				
+				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml.");
 			}	
 		}
+		
 		System.out.println("xml files: " + m.xmlFiles.size());
 		System.out.println("xsd files: " + m.xsdFiles.size());
+		
+		return;
 	}
 
 }
