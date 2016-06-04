@@ -25,6 +25,7 @@ public class Main {
 				this.xsdFiles.add(f);
 			return true;
 		} else {
+			System.out.println(filename + " not found. Omitting file.");
 			return false;
 		}
 	}
