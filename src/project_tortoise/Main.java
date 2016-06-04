@@ -16,9 +16,9 @@ public class Main {
 	private ArrayList<File> xsdFiles;
 	
 	public boolean validateFile(String filename, String type) {
-		File f = new File(filename);
+		File f = new File(",/" +filename);
 			
-		if (f.exists() && f.isFile()) {
+		if (f.exists() && !f.isDirectory()) {
 			if (type == "xml")
 				xmlFiles.add(f);
 			else
