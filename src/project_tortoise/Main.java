@@ -17,7 +17,7 @@ import org.xml.sax.SAXException;
 public class Main {
 
 	private ArrayList<File> xmlFiles;
-	private ArrayList<File> xsdFiles;
+	private File xsdSchemaFile;
 	
 	public boolean validateInput(String filename, String type) {
 		File f = new File(filename);
@@ -26,7 +26,7 @@ public class Main {
 			if (type == "xml")
 				this.xmlFiles.add(f);
 			else
-				this.xsdFiles.add(f);
+				this.xsdSchemaFile = f;
 
 			System.out.println("Read in file: " + filename);
 			return true;
@@ -68,7 +68,6 @@ public class Main {
 	public static void main(String[] args) {
 		Main m = new Main();
 		m.xmlFiles = new ArrayList<File>();
-		m.xsdFiles = new ArrayList<File>();
 		
 		if (args.length < 2) {
 			System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
@@ -77,7 +76,11 @@ public class Main {
 		
 		String xsdFileName = args[0];
 		if (xsdFileName.matches("(?i).*.xsd")) {
-			m.validateInput(xsdFileName,  "xsd");
+			if (m.validateInput(xsdFileName,  "xsd")) {
+				System.out.println("xsd validated");
+			} else {
+				return;
+			}
 		} else {
 			System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
 			return;
@@ -96,7 +99,7 @@ public class Main {
 		}
 		
 		System.out.println("xml files: " + m.xmlFiles.size());
-		System.out.println("xsd files: " + m.xsdFiles.size());
+		System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 		return;
 	}
