@@ -16,13 +16,13 @@ public class Main {
 	private ArrayList<File> xsdFiles;
 	
 	public boolean validateFile(String filename, String type) {
-		File f = new File(",/" +filename);
+		File f = new File(filename);
 			
-		if (f.exists()) {
+		if (f.exists() && f.isFile()) {
 			if (type == "xml")
-				xmlFiles.add(f);
+				this.xmlFiles.add(f);
 			else
-				xsdFiles.add(f);
+				this.xsdFiles.add(f);
 			return true;
 		} else {
 			return false;
@@ -50,6 +50,9 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Main m = new Main();
+		m.xmlFiles = new ArrayList<File>();
+		m.xsdFiles = new ArrayList<File>();
+		
 		for (String filename: args) {
 			System.out.println("Read in file: " + filename);
 			if (filename.matches("(?i).*.xml")) {
@@ -57,7 +60,7 @@ public class Main {
 			} else if (filename.matches("(?i).*.xsd")) {
 				m.validateFile(filename,  "xsd");
 			} else {
-				System.out.println("Invalid file name. Files must be in the format *.xml or *.xsd.");
+				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml or *.xsd.");
 				
 			}	
 		}
