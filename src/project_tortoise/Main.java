@@ -104,6 +104,10 @@ public class Main {
 		
 		for (File f: m.xmlFiles) {
 			boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
+			if (result) {
+				//TODO: parse validated XML files
+				//TODO: Output formatted CVS
+			}
 		}
 		return;
 	}
