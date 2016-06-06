@@ -77,15 +77,47 @@ public class Main {
 			doc.getDocumentElement().normalize();
 			Element root = doc.getDocumentElement();
 			System.out.println("Root element: " + root.getNodeName());
-			NodeList nList = root.getChildNodes();
 			
+			allNodes(root);
+			
+			//NodeList nList = root.getFirstChild();
+			
+	//		NodeList children = root.getChildNodes();
+			
+//			for (int i =0; i<children.getLength(); i++) {
+//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+//					System.out.println("child node: " + children.item(i).getNodeName());
+//				}
+//			}
+			
+			
+		
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	public static void allNodes(Node curr2){
+		
+		NodeList children = curr2.getChildNodes();
+		Node curr; 
+		
+		for (int i =0; i<children.getLength(); i++) {
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				curr = children.item(i);
+				//+ curr.getNodeName() + " parent: " + curr.getParentNode().getNodeName()
+				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
+				if(curr.hasChildNodes()){
+					allNodes(curr);
+				}
+			}
+		}
+		
+	}
+	
 	public static void parse(){
+		
 		
 	}
 	
