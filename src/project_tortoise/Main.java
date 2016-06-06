@@ -101,7 +101,6 @@ public class Main {
 
 			this.convertXmlToCsv(root);
 			System.out.println("Root element: " + root.getNodeName());
-
 			
 			this.makeTable(root);
 			
@@ -116,17 +115,25 @@ public class Main {
 
 	public void makeTable(Node root){
 		
-		ArrayList<Node> elementChildren = this.getElementChildNodes(root);
+		//look for first text node
+		ArrayList<Node> elementChildren = getElementChildNodes(root);
+		System.out.println(elementChildren.size());
+	}
+	
+	public static ArrayList<Node> getChildrenWithAttributes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> attChildren = new ArrayList<Node>();
 		
-		for (int i=0 ; i < elementChildren.size(); i ++){
-			System.out.println(elementChildren.get(i).hasAttributes());
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).hasAttributes()) {
+				attChildren.add(children.item(i));
+			}
 		}
-		
-		
+		return attChildren;
 	}
 	
 	//return NodeList of children that are elements
-	public ArrayList<Node> getElementChildNodes(Node node) {
+	public static ArrayList<Node> getElementChildNodes(Node node) {
 		NodeList children = node.getChildNodes();
 		ArrayList<Node> elementChildren = new ArrayList<Node>();
 		
