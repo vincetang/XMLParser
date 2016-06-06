@@ -78,7 +78,11 @@ public class Main {
 		}
 	}
 	
-	public void convertXMLCSV(File xmlFile) {
+	public void convertXmlToHtml(File xmlFile) {
+		
+	}
+	
+	public void parseXML(File xmlFile) {
 
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -88,13 +92,13 @@ public class Main {
 			doc.getDocumentElement().normalize();
 
 			this.output = new StringBuilder();
-			this.output.append("<HTML>");
+			
 			Element root = doc.getDocumentElement();
 			
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
-			
+
 			//this.conversionHelper(root);
 //			System.out.println("Root element: " + root.getNodeName());
 			
@@ -102,15 +106,33 @@ public class Main {
 			
 //			this.output.append("</HTML>");
 //			System.out.println(this.output.toString());
+			this.convertXmlToCsv(root);
+			System.out.println("Root element: " + root.getNodeName());
+			
+			//allNodes(root);
+			
+			//NodeList nList = root.getFirstChild();
+			
+			
+	//		NodeList children = root.getChildNodes();
+			
+//			for (int i =0; i<children.getLength(); i++) {
+//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+//					System.out.println("child node: " + children.item(i).getNodeName());
+//				}
+//			}
 			
 			this.makeTable(root);
 			
 			System.out.println(labels);
+
+			System.out.println(this.output.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+
 	public void makeTable(Node root){
 		
 		//ArrayList<String> labels = new ArrayList<String>();
@@ -149,7 +171,8 @@ public class Main {
 		//if has text as child, it is value
 	}
 	
-	public void conversionHelper(Node root) {
+
+	public void convertXmlToCsv(Node root) {
 		if (!(this.hasChildNodes(root))) {
 			this.tagNodes.add(root);
 //			this.xmlValues.add(root.getTextContent());
@@ -163,7 +186,7 @@ public class Main {
 				Node iNode = child.item(i);
 				if (iNode.getNodeType() == Node.ELEMENT_NODE) { // Gets rid of nodes created by whitespace
 					
-					this.conversionHelper(iNode);
+					this.convertXmlToCsv(iNode);
 				}
 			}
 			
@@ -273,7 +296,7 @@ public class Main {
 			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
 			
 			//TODO: parse validated XML files
-			m.convertXMLCSV(f);
+			m.parseXML(f);
 
 			//TODO: Output formatted CVS
 			
