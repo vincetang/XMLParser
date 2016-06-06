@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
 public class Main {
@@ -94,39 +95,19 @@ public class Main {
 			this.output = new StringBuilder();
 			
 			Element root = doc.getDocumentElement();
-			
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 
-			//this.conversionHelper(root);
-//			System.out.println("Root element: " + root.getNodeName());
-			
-			//allNodes(root);
-			
-//			this.output.append("</HTML>");
-//			System.out.println(this.output.toString());
 			this.convertXmlToCsv(root);
 			System.out.println("Root element: " + root.getNodeName());
-			
-			//allNodes(root);
-			
-			//NodeList nList = root.getFirstChild();
-			
-			
-	//		NodeList children = root.getChildNodes();
-			
-//			for (int i =0; i<children.getLength(); i++) {
-//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//					System.out.println("child node: " + children.item(i).getNodeName());
-//				}
-//			}
+
 			
 			this.makeTable(root);
 			
-			System.out.println(labels);
-
-			System.out.println(this.output.toString());
+//			System.out.println(labels);
+//
+//			System.out.println(this.output.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,35 +116,26 @@ public class Main {
 
 	public void makeTable(Node root){
 		
-		//ArrayList<String> labels = new ArrayList<String>();
-		NodeList children = root.getChildNodes();
-		Node curr;
+		ArrayList<Node> elementChildren = this.getElementChildNodes(root);
+		
+		for (int i=0 ; i < elementChildren.size(); i ++){
+			System.out.println(elementChildren.get(i).hasAttributes());
+		}
+		
+		
+	}
+	
+	//return NodeList of children that are elements
+	public ArrayList<Node> getElementChildNodes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> elementChildren = new ArrayList<Node>();
 		
 		for (int i = 0; i < children.getLength(); i++) {
-			curr = children.item(i);
-			int type = curr.getNodeType();
-			switch (type){
-				case Node.ELEMENT_NODE:
-					labels.add(curr.getNodeName());
-					//this is a label
-					//if element node has children, make table on children
-					break;
-				
-				case Node.TEXT_NODE:
-					//this is value
-					break;
-					
-				default:
-					break;
-				
-			
-				
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				elementChildren.add(children.item(i));
 			}
-		}		
-
-		
-		//for each child add to labels
-		
+		}
+		return elementChildren;
 	}
 	
 	public void getLabels(Node root){
@@ -171,7 +143,9 @@ public class Main {
 		//if has text as child, it is value
 	}
 	
-
+	
+	
+	
 	public void convertXmlToCsv(Node root) {
 		if (!(this.hasChildNodes(root))) {
 			this.tagNodes.add(root);
