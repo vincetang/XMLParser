@@ -74,8 +74,64 @@ public class Main {
 		}
 	}
 	
-	public void convertXmlToHtml(File xmlFile) {
+	public void convertXmlToHtml(Node root) {
+		/*
+		if have children nodes (elements)
+			write <table><tr>
+			
+			for each child {
+				write <th>child.getNodeName</th>
+			}
+			write </tr>
+			write <tr>
+			for each child {
+				if child has no children
+					write <td>value</td>
+				else:
+					write <table><tr> convertXmlToHtml(child) </tr></table>
+			write </tr>
+			<rite </table>
+		else (no children)
+			return <td>value</td>
+		*/
 		
+		if (!this.hasChildNodes(root)) {
+			this.output.append("<td>" + root.getTextContent() + "</td>");
+		} else {
+			this.output.append("<table><tr>");
+			NodeList children = root.getChildNodes();
+			if (children.toString().compareToIgnoreCase(this.previousTags) != 0) {
+				
+				for (int i = 0; i < children.getLength(); i++) {
+					if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+						this.output.append("<th>" + children.item(i).getNodeName() + "</th>");
+					}
+				}
+			} else {
+				//this.output.append("<tr>");
+			}
+			
+			this.output.append("</tr><tr>");
+			
+			for (int i = 0; i <children.getLength(); i++) {
+				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+					if (this.hasChildNodes(children.item(i))) {
+						//this.output.append("<td><table><tr>");
+						//this.output.append("<table>");
+						this.output.append("<td>");
+						this.convertXmlToHtml(children.item(i));
+						this.output.append("</td>");
+						//this.output.append("</td></tr></table><br/>");
+						//this.output.append("</table>");
+						
+					} else {
+						this.output.append("<td>" + children.item(i).getTextContent() + "</td>");
+						
+					}
+				}
+			}
+			this.output.append("</tr></table><br/>");
+		}
 	}
 	
 	public void parseXML(File xmlFile) {
@@ -95,9 +151,9 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 			
-			this.convertXmlToCsv(root);
-			System.out.println("Root element: " + root.getNodeName());
-			
+			//this.convertXmlToCsv(root);
+			//System.out.println("Root element: " + root.getNodeName());
+			this.convertXmlToHtml(root);
 			//allNodes(root);
 			
 			//NodeList nList = root.getFirstChild();
