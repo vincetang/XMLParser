@@ -6,12 +6,19 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class Main {
@@ -61,6 +68,20 @@ public class Main {
 		}
 	}
 	
+	public void convertXMLCSV(File xmlFile) {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			
+			Document doc = builder.parse(xmlFile);
+			doc.getDocumentElement().normalize();
+			Element root = doc.getDocumentElement();
+			System.out.println("Root element: " + root.getNodeName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void parse(){
 		
 	}
@@ -103,11 +124,13 @@ public class Main {
 		System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 		for (File f: m.xmlFiles) {
-			boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
-			if (result) {
-				//TODO: parse validated XML files
-				//TODO: Output formatted CVS
-			}
+			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
+			
+			//TODO: parse validated XML files
+			m.convertXMLCSV(f);
+
+			//TODO: Output formatted CVS
+			
 		}
 		return;
 	}
