@@ -99,10 +99,10 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 
-			this.convertXmlToCsv(root);
-			System.out.println("Root element: " + root.getNodeName());
+			//this.convertXmlToCsv(root);
+			//System.out.println("Root element: " + root.getNodeName());
 			
-			this.makeTable(root);
+			getSubNodesWithAttributes(root);
 			
 //			System.out.println(labels);
 //
@@ -116,16 +116,48 @@ public class Main {
 	public void makeTable(Node root){
 		
 		//look for first text node
-		ArrayList<Node> elementChildren = getElementChildNodes(root);
-		System.out.println(elementChildren.size());
+		//ArrayList<Node> elementChildren = getElementChildNodes(root);
 	}
 	
+	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
+		ArrayList<Node> subNodesWithAtt = new ArrayList<Node>();
+		ArrayList<Node> childrenWithAtt = new ArrayList<Node>();
+		ArrayList<Node> children = getElementChildNodes(node);
+		
+		
+		if (!node.hasChildNodes()){
+			return subNodesWithAtt;
+		}
+		
+		
+		childrenWithAtt = getChildrenWithAttributes(node);
+		subNodesWithAtt.addAll(childrenWithAtt);
+		if (childrenWithAtt.size()>0){
+			//for each child with att, look for children that may have att
+			for (int i=0; i < childrenWithAtt.size(); i++){
+				subNodesWithAtt.addAll(getSubNodesWithAttributes(childrenWithAtt.get(i)));
+			}
+		} else {
+			for (int i=0; i < children.size(); i++){
+				subNodesWithAtt.addAll(getSubNodesWithAttributes(children.get(i)));
+			}
+		}
+		
+		for (int i = 0; i < subNodesWithAtt.size(); i ++){
+			System.out.println(subNodesWithAtt.get(i).getNodeName());
+		}
+		
+		return subNodesWithAtt;
+	}
+	
+	
+	//Excludes UDP elements
 	public static ArrayList<Node> getChildrenWithAttributes(Node node) {
 		NodeList children = node.getChildNodes();
 		ArrayList<Node> attChildren = new ArrayList<Node>();
 		
 		for (int i = 0; i < children.getLength(); i++) {
-			if (children.item(i).hasAttributes()) {
+			if (children.item(i).hasAttributes() && !children.item(i).getNodeName().equalsIgnoreCase("udp_field")) {
 				attChildren.add(children.item(i));
 			}
 		}
