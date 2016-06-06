@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
 public class Main {
@@ -31,6 +32,10 @@ public class Main {
 	private String previousTags;
 	
 	private StringBuilder output;
+	
+	private ArrayList<String> labels = new ArrayList<String>();
+	
+	
 	public boolean validateInput(String filename, String type) {
 		
 		File f = new File(filename);
@@ -146,10 +151,10 @@ public class Main {
 			this.output = new StringBuilder();
 			
 			Element root = doc.getDocumentElement();
-			
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
+
 			
 			//this.convertXmlToCsv(root);
 			//System.out.println("Root element: " + root.getNodeName());
@@ -158,28 +163,69 @@ public class Main {
 			
 			//NodeList nList = root.getFirstChild();
 			
+
+			this.convertXmlToCsv(root);
+			System.out.println("Root element: " + root.getNodeName());
 			
-	//		NodeList children = root.getChildNodes();
+			this.makeTable(root);
 			
-//			for (int i =0; i<children.getLength(); i++) {
-//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//					System.out.println("child node: " + children.item(i).getNodeName());
-//				}
-//			}
-			
-			
-			System.out.println(this.output.toString());
+//			System.out.println(labels);
+//
+//			System.out.println(this.output.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+
+	public void makeTable(Node root){
+		
+		//look for first text node
+		ArrayList<Node> elementChildren = getElementChildNodes(root);
+		System.out.println(elementChildren.size());
+	}
+	
+	public static ArrayList<Node> getChildrenWithAttributes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> attChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).hasAttributes()) {
+				attChildren.add(children.item(i));
+			}
+		}
+		return attChildren;
+	}
+	
+	//return NodeList of children that are elements
+	public static ArrayList<Node> getElementChildNodes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> elementChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				elementChildren.add(children.item(i));
+			}
+		}
+		return elementChildren;
+	}
+	
+	public void getLabels(Node root){
+		//if has an element as a child, it is a label
+		//if has text as child, it is value
+	}
+	
+	
+	
+	
 	public void convertXmlToCsv(Node root) {
 		if (!(this.hasChildNodes(root))) {
 			this.tagNodes.add(root);
-			this.xmlValues.add(root.getTextContent());
+//			this.xmlValues.add(root.getTextContent());
+			this.output.append(root.getTextContent());
 //			System.out.println(root.getNodeName() + ":" + root.getTextContent());
 		} else {
+			this.output.append("<table>");
 			NodeList child = root.getChildNodes();
 
 			for (int i=0; i<child.getLength(); i++) {
@@ -198,10 +244,10 @@ public class Main {
 				for (int i = 0; i < this.tagNodes.size(); i++) {
 					//System.out.print(this.tagNodes.get(i).getNodeName());
 					this.output.append(this.tagNodes.get(i).getNodeName());
-					if (i < this.tagNodes.size()-1) {
-						//System.out.print(", ");
-						this.output.append(", ");
-					}
+//					if (i < this.tagNodes.size()-1) {
+//						//System.out.print(", ");
+//						this.output.append(", ");
+//					}
 				}
 				this.previousTags = this.tagNodes.toString();
 				//System.out.print('\n');
@@ -211,16 +257,15 @@ public class Main {
 			for (int i = 0; i < this.xmlValues.size(); i++) {
 //				System.out.print(this.xmlValues.get(i));
 				this.output.append(this.xmlValues.get(i));
-				if (i < this.xmlValues.size()-1) {
-//					System.out.print(", ");
-					this.output.append(", ");
-				} else {
-					this.output.append('\n');
-				}
+//				if (i < this.xmlValues.size()-1) {
+////					System.out.print(", ");
+//					this.output.append(", ");
+//				}
 			}
 //			System.out.print('\n');
 			this.tagNodes.clear();
 			this.xmlValues.clear();
+			this.output.append("</table>");
 		}
 	}
 	
@@ -242,7 +287,6 @@ public class Main {
 		for (int i =0; i<children.getLength(); i++) {
 			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
 				curr = children.item(i);
-				//+ curr.getNodeName() + " parent: " + curr.getParentNode().getNodeName()
 				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
 				if(curr.hasChildNodes()){
 					allNodes(curr);
