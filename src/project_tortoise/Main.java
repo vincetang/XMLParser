@@ -77,6 +77,7 @@ public class Main {
 	public void convertXmlToHtml(File xmlFile) {
 		
 	}
+	
 	public void parseXML(File xmlFile) {
 
 		try {
@@ -94,9 +95,7 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 			
-			this.output.append("<HTML>");
 			this.convertXmlToCsv(root);
-			this.output.append("</HTML>");
 			System.out.println("Root element: " + root.getNodeName());
 			
 			//allNodes(root);
