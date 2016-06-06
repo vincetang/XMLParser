@@ -96,17 +96,6 @@ public class Main {
 			
 			allNodes(root);
 			
-			//NodeList nList = root.getFirstChild();
-			
-	//		NodeList children = root.getChildNodes();
-			
-//			for (int i =0; i<children.getLength(); i++) {
-//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//					System.out.println("child node: " + children.item(i).getNodeName());
-//				}
-//			}
-			
-			
 			this.output.append("</HTML>");
 			System.out.println(this.output.toString());
 		} catch (Exception e) {
@@ -183,7 +172,6 @@ public class Main {
 		for (int i =0; i<children.getLength(); i++) {
 			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
 				curr = children.item(i);
-				//+ curr.getNodeName() + " parent: " + curr.getParentNode().getNodeName()
 				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
 				if(curr.hasChildNodes()){
 					allNodes(curr);
