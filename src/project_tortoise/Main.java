@@ -26,7 +26,13 @@ public class Main {
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
 	
+	private ArrayList<Node> tagNodes;
+	private ArrayList<String> xmlValues;
+	private String previousTags;
+	
+	private StringBuilder output;
 	public boolean validateInput(String filename, String type) {
+		
 		File f = new File(filename);
 			
 		if (f.exists() && f.isFile()) {
@@ -69,22 +75,92 @@ public class Main {
 	}
 	
 	public void convertXMLCSV(File xmlFile) {
+
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			
 			Document doc = builder.parse(xmlFile);
 			doc.getDocumentElement().normalize();
+
+			this.output = new StringBuilder();
+			this.output.append("<HTML>");
 			Element root = doc.getDocumentElement();
-			System.out.println("Root element: " + root.getNodeName());
-			NodeList nList = root.getChildNodes();
 			
+			this.tagNodes = new ArrayList<Node>();
+			this.xmlValues = new ArrayList<String>();
+			this.previousTags = "";
 			
+			this.conversionHelper(root);
+			
+			this.output.append("</HTML>");
+			System.out.println(this.output.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	
+	public void conversionHelper(Node root) {
+		if (!(this.hasChildNodes(root))) {
+			this.tagNodes.add(root);
+//			this.xmlValues.add(root.getTextContent());
+			this.output.append(root.getTextContent());
+//			System.out.println(root.getNodeName() + ":" + root.getTextContent());
+		} else {
+			this.output.append("<table>");
+			NodeList child = root.getChildNodes();
+
+			for (int i=0; i<child.getLength(); i++) {
+				Node iNode = child.item(i);
+				if (iNode.getNodeType() == Node.ELEMENT_NODE) { // Gets rid of nodes created by whitespace
+					
+					this.conversionHelper(iNode);
+				}
+			}
+			
+			if (this.previousTags.compareToIgnoreCase(this.tagNodes.toString()) != 0) {
+				//System.out.println(root.getNodeName());
+
+				this.output.append(root.getNodeName());
+				//System.out.println("Outputting pairs - tags:" + this.tagNodes.size() + " values: " + this.xmlValues.size());
+				for (int i = 0; i < this.tagNodes.size(); i++) {
+					//System.out.print(this.tagNodes.get(i).getNodeName());
+					this.output.append(this.tagNodes.get(i).getNodeName());
+//					if (i < this.tagNodes.size()-1) {
+//						//System.out.print(", ");
+//						this.output.append(", ");
+//					}
+				}
+				this.previousTags = this.tagNodes.toString();
+				//System.out.print('\n');
+				this.output.append("\n");
+			}
+			
+			for (int i = 0; i < this.xmlValues.size(); i++) {
+//				System.out.print(this.xmlValues.get(i));
+				this.output.append(this.xmlValues.get(i));
+//				if (i < this.xmlValues.size()-1) {
+////					System.out.print(", ");
+//					this.output.append(", ");
+//				}
+			}
+//			System.out.print('\n');
+			this.tagNodes.clear();
+			this.xmlValues.clear();
+			this.output.append("</table>");
+		}
+	}
+	
+	public boolean hasChildNodes(Node node) {
+		NodeList children = node.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public static void parse(){
 		
 	}
