@@ -31,6 +31,10 @@ public class Main {
 	private String previousTags;
 	
 	private StringBuilder output;
+	
+	private ArrayList<String> labels = new ArrayList<String>();
+	
+	
 	public boolean validateInput(String filename, String type) {
 		
 		File f = new File(filename);
@@ -91,24 +95,68 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 			
-			this.conversionHelper(root);
-			System.out.println("Root element: " + root.getNodeName());
+			//this.conversionHelper(root);
+//			System.out.println("Root element: " + root.getNodeName());
 			
 			//allNodes(root);
 			
-			this.output.append("</HTML>");
-			System.out.println(this.output.toString());
+//			this.output.append("</HTML>");
+//			System.out.println(this.output.toString());
+			
+			this.makeTable(root);
+			
+			System.out.println(labels);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	public void makeTable(Node root){
+		
+		//ArrayList<String> labels = new ArrayList<String>();
+		NodeList children = root.getChildNodes();
+		Node curr;
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			curr = children.item(i);
+			int type = curr.getNodeType();
+			switch (type){
+				case Node.ELEMENT_NODE:
+					labels.add(curr.getNodeName());
+					//this is a label
+					//if element node has children, make table on children
+					break;
+				
+				case Node.TEXT_NODE:
+					//this is value
+					break;
+					
+				default:
+					break;
+				
+			
+				
+			}
+		}		
+
+		
+		//for each child add to labels
+		
+	}
+	
+	public void getLabels(Node root){
+		//if has an element as a child, it is a label
+		//if has text as child, it is value
+	}
+	
 	public void conversionHelper(Node root) {
 		if (!(this.hasChildNodes(root))) {
 			this.tagNodes.add(root);
-			this.xmlValues.add(root.getTextContent());
+//			this.xmlValues.add(root.getTextContent());
+			this.output.append(root.getTextContent());
 //			System.out.println(root.getNodeName() + ":" + root.getTextContent());
 		} else {
+			this.output.append("<table>");
 			NodeList child = root.getChildNodes();
 
 			for (int i=0; i<child.getLength(); i++) {
@@ -127,10 +175,10 @@ public class Main {
 				for (int i = 0; i < this.tagNodes.size(); i++) {
 					//System.out.print(this.tagNodes.get(i).getNodeName());
 					this.output.append(this.tagNodes.get(i).getNodeName());
-					if (i < this.tagNodes.size()-1) {
-						//System.out.print(", ");
-						this.output.append(", ");
-					}
+//					if (i < this.tagNodes.size()-1) {
+//						//System.out.print(", ");
+//						this.output.append(", ");
+//					}
 				}
 				this.previousTags = this.tagNodes.toString();
 				//System.out.print('\n');
@@ -140,16 +188,15 @@ public class Main {
 			for (int i = 0; i < this.xmlValues.size(); i++) {
 //				System.out.print(this.xmlValues.get(i));
 				this.output.append(this.xmlValues.get(i));
-				if (i < this.xmlValues.size()-1) {
-//					System.out.print(", ");
-					this.output.append(", ");
-				} else {
-					this.output.append('\n');
-				}
+//				if (i < this.xmlValues.size()-1) {
+////					System.out.print(", ");
+//					this.output.append(", ");
+//				}
 			}
 //			System.out.print('\n');
 			this.tagNodes.clear();
 			this.xmlValues.clear();
+			this.output.append("</table>");
 		}
 	}
 	
