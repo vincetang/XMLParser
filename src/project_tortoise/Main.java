@@ -94,7 +94,7 @@ public class Main {
 			this.conversionHelper(root);
 			System.out.println("Root element: " + root.getNodeName());
 			
-			allNodes(root);
+			//allNodes(root);
 			
 			//NodeList nList = root.getFirstChild();
 			
@@ -117,11 +117,9 @@ public class Main {
 	public void conversionHelper(Node root) {
 		if (!(this.hasChildNodes(root))) {
 			this.tagNodes.add(root);
-//			this.xmlValues.add(root.getTextContent());
-			this.output.append(root.getTextContent());
+			this.xmlValues.add(root.getTextContent());
 //			System.out.println(root.getNodeName() + ":" + root.getTextContent());
 		} else {
-			this.output.append("<table>");
 			NodeList child = root.getChildNodes();
 
 			for (int i=0; i<child.getLength(); i++) {
@@ -140,10 +138,10 @@ public class Main {
 				for (int i = 0; i < this.tagNodes.size(); i++) {
 					//System.out.print(this.tagNodes.get(i).getNodeName());
 					this.output.append(this.tagNodes.get(i).getNodeName());
-//					if (i < this.tagNodes.size()-1) {
-//						//System.out.print(", ");
-//						this.output.append(", ");
-//					}
+					if (i < this.tagNodes.size()-1) {
+						//System.out.print(", ");
+						this.output.append(", ");
+					}
 				}
 				this.previousTags = this.tagNodes.toString();
 				//System.out.print('\n');
@@ -153,15 +151,16 @@ public class Main {
 			for (int i = 0; i < this.xmlValues.size(); i++) {
 //				System.out.print(this.xmlValues.get(i));
 				this.output.append(this.xmlValues.get(i));
-//				if (i < this.xmlValues.size()-1) {
-////					System.out.print(", ");
-//					this.output.append(", ");
-//				}
+				if (i < this.xmlValues.size()-1) {
+//					System.out.print(", ");
+					this.output.append(", ");
+				} else {
+					this.output.append('\n');
+				}
 			}
 //			System.out.print('\n');
 			this.tagNodes.clear();
 			this.xmlValues.clear();
-			this.output.append("</table>");
 		}
 	}
 	
