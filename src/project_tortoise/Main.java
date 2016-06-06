@@ -77,6 +77,9 @@ public class Main {
 			doc.getDocumentElement().normalize();
 			Element root = doc.getDocumentElement();
 			System.out.println("Root element: " + root.getNodeName());
+			NodeList nList = root.getChildNodes();
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
