@@ -157,6 +157,9 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 
+
+//			this.convertXmlToCsv(root);
+//			System.out.println("Root element: " + root.getNodeName());
 			
 			this.convertXmlToCsv(root);
 
@@ -164,7 +167,7 @@ public class Main {
 			
 			makeTable(root);
 
-			System.out.println(this.output);
+//			System.out.println(this.output);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -174,14 +177,33 @@ public class Main {
 
 	public void makeTable(Node root){
 		ArrayList<Node> nodes = getSubNodesWithAttributes(root);
+		Node curr;
+		
+		//for each make a table
 		for (int i=0; i < nodes.size(); i++){
-			System.out.println(cnsmrType(nodes.get(i)));
+			curr = nodes.get(i);
+			allAttributesAsString(curr);			
 		}
 
 	}
 	
 	public String cnsmrType(Node n){
 		return n.getAttributes().getNamedItem("type").getNodeValue();
+	}
+	
+	public static String allAttributesAsString(Node n){
+		StringBuilder output = new StringBuilder();
+		Node currAtt;
+		NamedNodeMap attributes = n.getAttributes();
+		
+		for (int i=0; i < attributes.getLength(); i++){
+			currAtt = attributes.item(i);
+			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
+		}
+		
+		System.out.println(output);
+		
+		return output.toString();
 	}
 	
 	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
