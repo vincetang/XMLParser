@@ -34,7 +34,7 @@ public class Main {
 	private StringBuilder output;
 	
 	private ArrayList<String> labels = new ArrayList<String>();
-	
+	private ArrayList<String> typesSeen = new ArrayList<String>();
 	
 	public boolean validateInput(String filename, String type) {
 		
@@ -167,7 +167,7 @@ public class Main {
 			this.convertXmlToCsv(root);
 			System.out.println("Root element: " + root.getNodeName());
 			
-			getSubNodesWithAttributes(root);
+			makeTable(root);
 			
 //			System.out.println(labels);
 //
@@ -179,9 +179,15 @@ public class Main {
 	
 
 	public void makeTable(Node root){
-		
-		//look for first text node
-		//ArrayList<Node> elementChildren = getElementChildNodes(root);
+		ArrayList<Node> nodes = getSubNodesWithAttributes(root);
+		for (int i=0; i < nodes.size(); i++){
+			System.out.println(cnsmrType(nodes.get(i)));
+		}
+
+	}
+	
+	public String cnsmrType(Node n){
+		return n.getAttributes().getNamedItem("type").getNodeValue();
 	}
 	
 	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
@@ -189,11 +195,9 @@ public class Main {
 		ArrayList<Node> childrenWithAtt = new ArrayList<Node>();
 		ArrayList<Node> children = getElementChildNodes(node);
 		
-		
 		if (!node.hasChildNodes()){
 			return subNodesWithAtt;
 		}
-		
 		
 		childrenWithAtt = getChildrenWithAttributes(node);
 		subNodesWithAtt.addAll(childrenWithAtt);
@@ -207,10 +211,10 @@ public class Main {
 				subNodesWithAtt.addAll(getSubNodesWithAttributes(children.get(i)));
 			}
 		}
-		
-		for (int i = 0; i < subNodesWithAtt.size(); i ++){
-			System.out.println(subNodesWithAtt.get(i).getNodeName());
-		}
+//		
+//		for (int i = 0; i < subNodesWithAtt.size(); i ++){
+//			System.out.println(subNodesWithAtt.get(i).getNodeName());
+//		}
 		
 		return subNodesWithAtt;
 	}
@@ -328,11 +332,7 @@ public class Main {
 		
 	}
 
-	public static void parse(){
-		
-		
-	}
-	
+
 	// input: Main.class schema.xsd file1.xml file2.xml...
 	public static void main(String[] args) {
 		Main m = new Main();
