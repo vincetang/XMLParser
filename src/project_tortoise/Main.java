@@ -3,7 +3,6 @@ package project_tortoise;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -33,6 +32,7 @@ public class Main {
 	private ArrayList<String> xmlValues;
 	private String previousTags;
 	private boolean scene;
+	private Map<String, String> outputMap;
 	
 	private StringBuilder output;
 	
@@ -154,6 +154,7 @@ public class Main {
 			this.output = new StringBuilder();
 			
 			Element root = doc.getDocumentElement();
+			this.outputMap = new HashMap<String, String>();
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
 			this.tagNames = new ArrayList<String>();
@@ -162,11 +163,18 @@ public class Main {
 //			this.convertXmlToCsv(root);
 //			System.out.println("Root element: " + root.getNodeName());
 			
-			//this.convertXmlToCsv(root);
+			this.convertXmlToCsv(root);
 
+			Iterator iter = outputMap.entrySet().iterator();
+			while (iter.hasNext()) {
+				Map.Entry ent = (Map.Entry) iter.next();
+				System.out.print(ent.getKey() + ":");
+				System.out.println(ent.getValue().toString());
+			}
+			
 			//System.out.println("Root element: " + root.getNodeName());
 			
-			makeTables(root);
+//			makeTables(root);
 			//System.out.println(this.output);
 
 		} catch (Exception e) {
@@ -380,11 +388,16 @@ public class Main {
 				}
 			}
 			
-			if (!this.scene) {
-				this.output.append(String.join(", ", this.tagNames) + "\n");
+			if (!this.outputMap.containsKey(root.getNodeName())) {
+					this.output.append(String.join(", ", this.tagNames) + "\n");
+					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
 			}
-			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			
+			//System.out.println("*****" + this.xmlValues.toString().replace("[", "").replace("]", ""));//String.join(", ", this.xmlValues + "\n") + "*****");
+			this.output.append(String.join(", ", this.xmlValues) + "\n");
+			this.outputMap.put(root.getNodeName(), 
+					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
+		
 			this.xmlValues.clear();
 			this.tagNames.clear();
 			
@@ -394,7 +407,7 @@ public class Main {
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
 						this.output.append("\n" + child.getNodeName() +"\n");
-						
+						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
 						NamedNodeMap attrs = child.getAttributes();
 						for (int j = 0; j < attrs.getLength(); j++) {
 							this.tagNames.add(attrs.item(j).getNodeName());
