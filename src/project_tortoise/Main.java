@@ -31,6 +31,7 @@ public class Main {
 	private ArrayList<String> tagNames;
 	private ArrayList<String> xmlValues;
 	private String previousTags;
+	private boolean scene;
 	
 	private StringBuilder output;
 	
@@ -156,8 +157,13 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.previousTags = "";
 
+
 //			this.convertXmlToCsv(root);
 //			System.out.println("Root element: " + root.getNodeName());
+			
+			this.convertXmlToCsv(root);
+
+			System.out.println("Root element: " + root.getNodeName());
 			
 			makeTable(root);
 
@@ -284,7 +290,7 @@ public class Main {
 		 */
 		this.tagNames = new ArrayList<String>();
 		this.xmlValues = new ArrayList<String>();
-		
+		boolean seen = false;
 		if (!this.hasChildNodes(root)) {
 			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
 		} else {
@@ -299,7 +305,9 @@ public class Main {
 				}
 			}
 			
-			this.output.append(String.join(", ", this.tagNames) + "\n");
+			if (!this.scene) {
+				this.output.append(String.join(", ", this.tagNames) + "\n");
+			}
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			
 			for (int i = 0; i < children.size(); i++) {
@@ -307,7 +315,11 @@ public class Main {
 			
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append(child.getNodeName());
+						this.output.append("\n" + child.getNodeName() + "\n");
+						this.previousTags = child.getNodeName();
+						this.scene = false;
+					} else {
+						this.scene=true;
 					}
 					this.convertXmlToCsv(child);
 				}
