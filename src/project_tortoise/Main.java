@@ -183,11 +183,19 @@ public class Main {
 		StringBuilder tableHTML = new StringBuilder();
 		String text;
 		
+		ArrayList<String> nodeNames = new ArrayList<String>();
 		ArrayList<String> nodeTextContent = new ArrayList<String>();
 		curr = tableRoots.get(0);
+		
+		nodeNames = getCnsmrNodeNames(curr);
 		nodeTextContent = getCnsmrTextNodeValues(curr);
 		
 		tableHTML.append("<table border=1px><tr>");
+		for (int i=0; i < nodeNames.size(); i++){
+			tableHTML.append("<th>" + nodeNames.get(i) +"</th>");
+		}
+		tableHTML.append("</tr><tr>");
+
 		
 		for (int i= 0; i < nodeTextContent.size(); i++){
 			if (nodeTextContent.get(i).isEmpty()){
@@ -246,28 +254,43 @@ public class Main {
 			curr = nodes.get(i);
 			textNodeValues.add(curr.getTextContent());
 		}
-		
 		return textNodeValues;
 	}
+	
+	
+	
+	public ArrayList<String> getCnsmrNodeNames(Node n){
+		ArrayList<String> nodeNames = new ArrayList<String>();
+		ArrayList<Node> nodes = getElementChildNodes(n);
+		Node curr;
+		for (int i = 0; i < nodes.size() ;i++){
+			curr = nodes.get(i);
+			nodeNames.add(curr.getNodeName());
+		}
+		return nodeNames;
+	}
+	
+	
 	
 	public String cnsmrType(Node n){
 		return n.getAttributes().getNamedItem("type").getNodeValue();
 	}
 	
+	
+	
 	public static String allAttributesAsString(Node n){
 		StringBuilder output = new StringBuilder();
 		Node currAtt;
 		NamedNodeMap attributes = n.getAttributes();
-		
 		for (int i=0; i < attributes.getLength(); i++){
 			currAtt = attributes.item(i);
 			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
 		}
-		
 		System.out.println(output);
-		
 		return output.toString();
 	}
+	
+	
 	
 	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
 		ArrayList<Node> subNodesWithAtt = new ArrayList<Node>();
@@ -321,12 +344,7 @@ public class Main {
 		return elementChildren;
 	}
 
-	public void getLabels(Node root){
-		//if has an element as a child, it is a label
-		//if has text as child, it is value
-	}
-	
-	
+
 	
 	
 	public void convertXmlToCsv(Node root) {
