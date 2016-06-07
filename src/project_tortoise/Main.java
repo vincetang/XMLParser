@@ -36,6 +36,7 @@ public class Main {
 	
 	private StringBuilder output;
 	
+
 	private ArrayList<String> labels = new ArrayList<String>();
 	
 	public boolean validateInput(String filename, String type) {
@@ -161,12 +162,12 @@ public class Main {
 //			this.convertXmlToCsv(root);
 //			System.out.println("Root element: " + root.getNodeName());
 			
-			this.convertXmlToCsv(root);
+			//this.convertXmlToCsv(root);
 
-			System.out.println("Root element: " + root.getNodeName());
+			//System.out.println("Root element: " + root.getNodeName());
 			
 			makeTables(root);
-			System.out.println(this.output);
+			//System.out.println(this.output);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -176,15 +177,57 @@ public class Main {
 	
 	public void makeTables(Node root){
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
-		ArrayList<String> typesSeen = new ArrayList<String>();
+		//ArrayList<String> typesSeen = new ArrayList<String>();
 		Node curr;
 		String type;
-		// cnsmr type : html code for table as string
-		Map output = new HashMap();
+		StringBuilder tableHTML = new StringBuilder();
+		String text;
 		
-		for (int i=0; i < tableRoots.size(); i++){
-			curr = tableRoots.get(i);
+		ArrayList<String> nodeTextContent = new ArrayList<String>();
+		curr = tableRoots.get(0);
+		nodeTextContent = getCnsmrTextNodeValues(curr);
+		
+		tableHTML.append("<table border=1px><tr>");
+		
+		for (int i= 0; i < nodeTextContent.size(); i++){
+			if (nodeTextContent.get(i).isEmpty()){
+				text = "null";
+			} else {
+				text = nodeTextContent.get(i);
+			}
+			tableHTML.append("<td>" + text + "</td>");
 		}
+		
+		tableHTML.append("</tr></table>");
+		
+		System.out.print(tableHTML);
+	
+		
+		
+		// cnsmr type : html code for table as string
+//		Map output = new HashMap();
+//				
+//		for (int i=0; i < tableRoots.size(); i++){
+//			curr = tableRoots.get(i);
+//			type = cnsmrType(curr);
+//			if (output.containsKey(type)){
+//				/*if type is in hash, 
+//				 * 		just get node values and create a row
+//				 * 		append to value 
+//				 * */
+//				
+//				
+//				
+//			} else {
+//				 /*else
+//				 * 		create new hash with type as key
+//				 * 		create new string builder
+//				 * 		create labels
+//				 * 		create row with values
+//				 * */
+//			}
+//		}
+		
 	}
 		
 	
@@ -195,6 +238,17 @@ public class Main {
 	//   HELPERS
 	//*************************************************************
 	
+	public ArrayList<String> getCnsmrTextNodeValues(Node n){
+		ArrayList<String> textNodeValues = new ArrayList<String>();
+		ArrayList<Node> nodes = getElementChildNodes(n);
+		Node curr;
+		for (int i = 0; i < nodes.size() ;i++){
+			curr = nodes.get(i);
+			textNodeValues.add(curr.getTextContent());
+		}
+		
+		return textNodeValues;
+	}
 	
 	public String cnsmrType(Node n){
 		return n.getAttributes().getNamedItem("type").getNodeValue();
