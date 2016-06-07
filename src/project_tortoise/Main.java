@@ -28,6 +28,7 @@ public class Main {
 	private File xsdSchemaFile;
 	
 	private ArrayList<Node> tagNodes;
+	private ArrayList<String> tagNames;
 	private ArrayList<String> xmlValues;
 	private String previousTags;
 	
@@ -156,22 +157,22 @@ public class Main {
 			this.previousTags = "";
 
 			
-			//this.convertXmlToCsv(root);
+			this.convertXmlToCsv(root);
+			
 			//System.out.println("Root element: " + root.getNodeName());
-			this.convertXmlToHtml(root);
+			//this.convertXmlToHtml(root);
 			//allNodes(root);
 			
 			//NodeList nList = root.getFirstChild();
 			
-
-			this.convertXmlToCsv(root);
-			System.out.println("Root element: " + root.getNodeName());
-			
-			getSubNodesWithAttributes(root);
+			System.out.println(this.output);
+//			this.convertXmlToCsv(root);
+//			System.out.println("Root element: " + root.getNodeName());
+//			
+//			getSubNodesWithAttributes(root);
 			
 //			System.out.println(labels);
 //
-//			System.out.println(this.output.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -251,53 +252,53 @@ public class Main {
 	
 	
 	public void convertXmlToCsv(Node root) {
-		if (!(this.hasChildNodes(root))) {
-			this.tagNodes.add(root);
-//			this.xmlValues.add(root.getTextContent());
-			this.output.append(root.getTextContent());
-//			System.out.println(root.getNodeName() + ":" + root.getTextContent());
+		/* for children of root {
+		 * 	if child has no children
+		 * 		add to tags
+		 * 		add to values
+		 * }
+		 * output tags,
+		 * output values
+		 * 
+		 * for children of root {
+		 * 	if child has children
+		 * 		output child tag (if not-seen)
+		 * 		recursve on child
+		 * }
+		 *  	
+		 * 
+		 * 
+		 */
+		this.tagNames = new ArrayList<String>();
+		this.xmlValues = new ArrayList<String>();
+		
+		if (!this.hasChildNodes(root)) {
+			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
 		} else {
-			this.output.append("<table>");
-			NodeList child = root.getChildNodes();
-
-			for (int i=0; i<child.getLength(); i++) {
-				Node iNode = child.item(i);
-				if (iNode.getNodeType() == Node.ELEMENT_NODE) { // Gets rid of nodes created by whitespace
-					
-					this.convertXmlToCsv(iNode);
+			ArrayList<Node> children = getElementChildNodes(root);
+			
+			for (int i = 0; i < children.size(); i++) {
+				Node child = children.get(i);
+				
+				if (!this.hasChildNodes(child)) {
+					this.tagNames.add(child.getNodeName());
+					this.xmlValues.add(child.getTextContent());
 				}
 			}
 			
-			if (this.previousTags.compareToIgnoreCase(this.tagNodes.toString()) != 0) {
-				//System.out.println(root.getNodeName());
-
-				this.output.append(root.getNodeName());
-				//System.out.println("Outputting pairs - tags:" + this.tagNodes.size() + " values: " + this.xmlValues.size());
-				for (int i = 0; i < this.tagNodes.size(); i++) {
-					//System.out.print(this.tagNodes.get(i).getNodeName());
-					this.output.append(this.tagNodes.get(i).getNodeName());
-//					if (i < this.tagNodes.size()-1) {
-//						//System.out.print(", ");
-//						this.output.append(", ");
-//					}
-				}
-				this.previousTags = this.tagNodes.toString();
-				//System.out.print('\n');
-				this.output.append("\n");
-			}
+			this.output.append(String.join(", ", this.tagNames) + "\n");
+			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			
-			for (int i = 0; i < this.xmlValues.size(); i++) {
-//				System.out.print(this.xmlValues.get(i));
-				this.output.append(this.xmlValues.get(i));
-//				if (i < this.xmlValues.size()-1) {
-////					System.out.print(", ");
-//					this.output.append(", ");
-//				}
+			for (int i = 0; i < children.size(); i++) {
+				Node child = children.get(i);
+			
+				if (this.hasChildNodes(child)) {
+					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
+						this.output.append(child.getNodeName());
+					}
+					this.convertXmlToCsv(child);
+				}
 			}
-//			System.out.print('\n');
-			this.tagNodes.clear();
-			this.xmlValues.clear();
-			this.output.append("</table>");
 		}
 	}
 	
