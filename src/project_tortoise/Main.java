@@ -165,9 +165,9 @@ public class Main {
 
 			System.out.println("Root element: " + root.getNodeName());
 			
-			makeTable(root);
+//			makeTable(root);
 
-//			System.out.println(this.output);
+			System.out.println(this.output);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -315,7 +315,7 @@ public class Main {
 			
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() + child.getAttributes().toString() + "\n");
+						this.output.append("\n" + child.getNodeName() + allAttributesAsString(child) + "\n");
 						this.previousTags = child.getNodeName();
 						this.scene = false;
 					} else {
