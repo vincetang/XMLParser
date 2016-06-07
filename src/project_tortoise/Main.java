@@ -166,8 +166,7 @@ public class Main {
 			System.out.println("Root element: " + root.getNodeName());
 			
 			makeTables(root);
-
-//			System.out.println(this.output);
+			System.out.println(this.output);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,62 +187,6 @@ public class Main {
 		}
 	}
 		
-	public void convertXmlToCsv(Node root) {
-		/* for children of root {
-		 * 	if child has no children
-		 * 		add to tags
-		 * 		add to values
-		 * }
-		 * output tags,
-		 * output values
-		 * 
-		 * for children of root {
-		 * 	if child has children
-		 * 		output child tag (if not-seen)
-		 * 		recursve on child
-		 * }
-		 *  	
-		 * 
-		 * 
-		 */
-		this.tagNames = new ArrayList<String>();
-		this.xmlValues = new ArrayList<String>();
-		boolean seen = false;
-		if (!this.hasChildNodes(root)) {
-			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
-		} else {
-			ArrayList<Node> children = getElementChildNodes(root);
-			
-			for (int i = 0; i < children.size(); i++) {
-				Node child = children.get(i);
-				
-				if (!this.hasChildNodes(child)) {
-					this.tagNames.add(child.getNodeName());
-					this.xmlValues.add(child.getTextContent());
-				}
-			}
-			
-			if (!this.scene) {
-				this.output.append(String.join(", ", this.tagNames) + "\n");
-			}
-			this.output.append(String.join(", ", this.xmlValues) + "\n");
-			
-			for (int i = 0; i < children.size(); i++) {
-				Node child = children.get(i);
-			
-				if (this.hasChildNodes(child)) {
-					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() + "\n");
-						this.previousTags = child.getNodeName();
-						this.scene = false;
-					} else {
-						this.scene=true;
-					}
-					this.convertXmlToCsv(child);
-				}
-			}
-		}
-	}
 	
 
 	
@@ -323,7 +266,73 @@ public class Main {
 		}
 		return elementChildren;
 	}
+
+	public void getLabels(Node root){
+		//if has an element as a child, it is a label
+		//if has text as child, it is value
+	}
 	
+	
+	
+	
+	public void convertXmlToCsv(Node root) {
+		/* for children of root {
+		 * 	if child has no children
+		 * 		add to tags
+		 * 		add to values
+		 * }
+		 * output tags,
+		 * output values
+		 * 
+		 * for children of root {
+		 * 	if child has children
+		 * 		output child tag (if not-seen)
+		 * 		recursve on child
+		 * }
+		 *  	
+		 * 
+		 * 
+		 */
+		this.tagNames = new ArrayList<String>();
+		this.xmlValues = new ArrayList<String>();
+		boolean seen = false;
+		if (!this.hasChildNodes(root)) {
+			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
+		} else {
+			ArrayList<Node> children = getElementChildNodes(root);
+			
+			for (int i = 0; i < children.size(); i++) {
+				Node child = children.get(i);
+				
+				if (!this.hasChildNodes(child)) {
+					this.tagNames.add(child.getNodeName());
+					this.xmlValues.add(child.getTextContent());
+				}
+			}
+			
+			if (!this.scene) {
+				this.output.append(String.join(", ", this.tagNames) + "\n");
+			}
+			this.output.append(String.join(", ", this.xmlValues) + "\n");
+			
+			for (int i = 0; i < children.size(); i++) {
+				Node child = children.get(i);
+			
+				if (this.hasChildNodes(child)) {
+					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
+						this.output.append("\n" + child.getNodeName() + allAttributesAsString(child) + "\n");
+						this.previousTags = child.getNodeName();
+						this.scene = false;
+					} else {
+						this.scene=true;
+					}
+					this.convertXmlToCsv(child);
+				}
+			}
+		}
+	}
+	
+
 	public boolean hasChildNodes(Node node) {
 		NodeList children = node.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
