@@ -82,67 +82,7 @@ public class Main {
 			
 		}
 	}
-	
-	public void convertXmlToHtml(Node root) {
-		/*
-		if have children nodes (elements)
-			write <table><tr>
-			
-			for each child {
-				write <th>child.getNodeName</th>
-			}
-			write </tr>
-			write <tr>
-			for each child {
-				if child has no children
-					write <td>value</td>
-				else:
-					write <table><tr> convertXmlToHtml(child) </tr></table>
-			write </tr>
-			<rite </table>
-		else (no children)
-			return <td>value</td>
-		*/
-		
-		if (!this.hasChildNodes(root)) {
-			this.output.append("<td>" + root.getTextContent() + "</td>");
-		} else {
-			this.output.append("<table><tr>");
-			NodeList children = root.getChildNodes();
-			if (children.toString().compareToIgnoreCase(this.previousTags) != 0) {
-				
-				for (int i = 0; i < children.getLength(); i++) {
-					if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-						this.output.append("<th>" + children.item(i).getNodeName() + "</th>");
-					}
-				}
-			} else {
-				//this.output.append("<tr>");
-			}
-			
-			this.output.append("</tr><tr>");
-			
-			for (int i = 0; i <children.getLength(); i++) {
-				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-					if (this.hasChildNodes(children.item(i))) {
-						//this.output.append("<td><table><tr>");
-						//this.output.append("<table>");
-						this.output.append("<td>");
-						this.convertXmlToHtml(children.item(i));
-						this.output.append("</td>");
-						//this.output.append("</td></tr></table><br/>");
-						//this.output.append("</table>");
-						
-					} else {
-						this.output.append("<td>" + children.item(i).getTextContent() + "</td>");
-						
-					}
-				}
-			}
-			this.output.append("</tr></table><br/>");
-		}
-	}
-	
+
 	public void parseXML(File xmlFile) {
 
 		try {
@@ -162,7 +102,8 @@ public class Main {
 			this.previousTags = "";
 
 //			this.convertXmlToCsv(root);
-//			System.out.println("Root element: " + root.getNodeName());
+						
+			//converToHTML(root);
 			
 			this.convertXmlToCsv(root);
 
@@ -179,82 +120,99 @@ public class Main {
 //			makeTables(root);
 			//System.out.println(this.output);
 
+			Node cnsmr_phn_2 = getSubNodesWithAttributes(root).get(2);
+			ArrayList<Node> cnsmr_phn_2_children = getElementChildNodes(cnsmr_phn_2);
+			
+			System.out.println(getNullifiedFieldNames(cnsmr_phn_2_children.get(0)));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private Map mapTypeToCnsmrTables = new HashMap(); // cnsmr type : cnsmr hashmap for table as string
+	private Map mapTypeToValuePositions = new HashMap();
 	
-	public void makeTables(Node root){
+	public void converToHTML(Node root){
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
-		//ArrayList<String> typesSeen = new ArrayList<String>();
-		Node curr;
-		String type;
-		StringBuilder tableHTML = new StringBuilder();
-		String text;
+		Node curr; 
+		Map currMap;
 		
-		ArrayList<String> nodeNames = new ArrayList<String>();
-		ArrayList<String> nodeTextContent = new ArrayList<String>();
-		curr = tableRoots.get(0);
-		
-		nodeNames = getCnsmrNodeNames(curr);
-		nodeTextContent = getCnsmrTextNodeValues(curr);
-		
-		tableHTML.append("<table border=1px><tr>");
-		for (int i=0; i < nodeNames.size(); i++){
-			tableHTML.append("<th>" + nodeNames.get(i) +"</th>");
-		}
-		tableHTML.append("</tr><tr>");
-
-		
-		for (int i= 0; i < nodeTextContent.size(); i++){
-			if (nodeTextContent.get(i).isEmpty()){
-				text = "null";
-			} else {
-				text = nodeTextContent.get(i);
-			}
-			tableHTML.append("<td>" + text + "</td>");
-		}
-		
-		tableHTML.append("</tr></table>");
-		
-		System.out.print(tableHTML);
-	
-		
-		
-		// cnsmr type : html code for table as string
-//		Map output = new HashMap();
-//				
-//		for (int i=0; i < tableRoots.size(); i++){
-//			curr = tableRoots.get(i);
-//			type = cnsmrType(curr);
-//			if (output.containsKey(type)){
-//				/*if type is in hash, 
-//				 * 		just get node values and create a row
-//				 * 		append to value 
-//				 * */
-//				
-//				
+		for (int i=0; i < tableRoots.size(); i++){
+			
+			curr = tableRoots.get(i);
+			
+//			if (mapTypeToCnsmrTables.containsKey(cnsmrType(curr))){
+//				// add new row
 //				
 //			} else {
-//				 /*else
-//				 * 		create new hash with type as key
-//				 * 		create new string builder
-//				 * 		create labels
-//				 * 		create row with values
-//				 * */
+//				// create new cnsmr table
 //			}
-//		}
+		}
 		
 	}
-		
 	
+	
+	
+	
+//	
+//	public void makeNewHTMLTable(Node n){
+//		String type = cnsmrType(n);
+//		StringBuilder table = new StringBuilder();
+//		String text;
+//		
+//		ArrayList<String> labels = getCnsmrNodeNames(n);
+//		ArrayList<String> textContent = getCnsmrTextNodeValues(n);
+//
+//		table.append("<table border=1px>");
+//		table.append("<tr>");
+//		for (int i=0; i < labels.size(); i++){
+//			table.append("<th>"+labels.get(i)+"</th>");
+//		}
+//		table.append("</tr><tr>");
+//		for (int i= 0; i < textContent.size(); i++){
+//			if (textContent.get(i).isEmpty()){
+//				text = "null";
+//			} else {
+//				text = textContent.get(i);
+//			}
+//			table.append("<td>" + text + "</td>");
+//		}
+//		table.append("</tr>");		
+//		//insert type and table into mapCnsmrTypeTable 
+//		mapCnsmrTypeTable.put(type, table);
+//	}
+//
+//	public void addNewTableRow(Node n){
+//		StringBuilder table = (StringBuilder) mapCnsmrTypeTable.get(cnsmrType(n));
+//		ArrayList<String> textContent = getCnsmrTextNodeValues(n);
+//		String text;
+//		
+//		table.append("<tr>");
+//		for (int i= 0; i < textContent.size(); i++){
+//			if (textContent.get(i).isEmpty()){
+//				text = "null";
+//			} else {
+//				text = textContent.get(i);
+//			}
+//			table.append("<td>" + text + "</td>");
+//		}
+//		table.append("</tr>");	
+//
+//		
+//	}
+//	
+//	public void closeTables(){
+//		
+//	}
 
-	
 
 	//*************************************************************
 	//   HELPERS
 	//*************************************************************
+	
+	public void makeNewCnsmrMap(){
+		
+	}
 	
 	public ArrayList<String> getCnsmrTextNodeValues(Node n){
 		ArrayList<String> textNodeValues = new ArrayList<String>();
@@ -262,6 +220,9 @@ public class Main {
 		Node curr;
 		for (int i = 0; i < nodes.size() ;i++){
 			curr = nodes.get(i);
+			if (curr.getNodeName().equals("nullify_fields")){
+				//do something 
+			}
 			textNodeValues.add(curr.getTextContent());
 		}
 		return textNodeValues;
@@ -275,15 +236,67 @@ public class Main {
 		Node curr;
 		for (int i = 0; i < nodes.size() ;i++){
 			curr = nodes.get(i);
-			nodeNames.add(curr.getNodeName());
+			if (curr.getNodeName().equals("nullify_fields")){
+				nodeNames.addAll(getNullifiedFieldNames(curr));
+			} else {
+				nodeNames.add(curr.getNodeName());
+			}
 		}
 		return nodeNames;
 	}
 	
 	
+	// takes nullified element
+	public ArrayList<String> getNullifiedFieldNames(Node n){
+		ArrayList<Node> nullifiedFields = getSubNodesWithTextContent(n);
+		ArrayList<String> fieldNames = new ArrayList<String>();
+		
+		for (int i = 0; i < nullifiedFields.size(); i++){
+			fieldNames.add(nullifiedFields.get(i).getTextContent());
+		}
+		return fieldNames;
+	}
 	
 	public String cnsmrType(Node n){
 		return n.getAttributes().getNamedItem("type").getNodeValue();
+	}
+	
+	
+	public static ArrayList<Node> getSubNodesWithTextContent(Node node){
+		ArrayList<Node> subNodesTextContent = new ArrayList<Node>();
+		ArrayList<Node> childrenTextContent = new ArrayList<Node>();
+		ArrayList<Node> children = getElementChildNodes(node);
+		
+		if (!node.hasChildNodes()){
+			return subNodesTextContent;
+		}
+		
+		childrenTextContent = getChildrenWithTextContent(node);
+		subNodesTextContent.addAll(childrenTextContent);
+		if (childrenTextContent.size()>0){
+			//for each child with text content, look for children that may have text content
+			for (int i=0; i < childrenTextContent.size(); i++){
+				subNodesTextContent.addAll(getSubNodesWithTextContent(childrenTextContent.get(i)));
+			}
+		} else {
+			for (int i=0; i < children.size(); i++){
+				subNodesTextContent.addAll(getSubNodesWithTextContent(children.get(i)));
+			}
+		}
+		return subNodesTextContent;
+	}
+	
+	public static ArrayList<Node> getChildrenWithTextContent(Node node) {
+		ArrayList<Node> children = getElementChildNodes(node);
+		ArrayList<Node> textChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.size(); i++) {
+			if (!children.get(i).getTextContent().isEmpty() && 
+				!children.get(i).getNodeName().equalsIgnoreCase("udp_field")) {
+				textChildren.add(children.get(i));
+			}
+		}
+		return textChildren;
 	}
 	
 	
@@ -340,6 +353,8 @@ public class Main {
 		}
 		return attChildren;
 	}
+	
+
 	
 	//return ArrayList<Node> children that are elements
 	public static ArrayList<Node> getElementChildNodes(Node node) {
@@ -505,3 +520,66 @@ public class Main {
 	}
 
 }
+
+
+//
+//public void convertXmlToHtml(Node root) {
+//	/*
+//	if have children nodes (elements)
+//		write <table><tr>
+//		
+//		for each child {
+//			write <th>child.getNodeName</th>
+//		}
+//		write </tr>
+//		write <tr>
+//		for each child {
+//			if child has no children
+//				write <td>value</td>
+//			else:
+//				write <table><tr> convertXmlToHtml(child) </tr></table>
+//		write </tr>
+//		<rite </table>
+//	else (no children)
+//		return <td>value</td>
+//	*/
+//	
+//	if (!this.hasChildNodes(root)) {
+//		this.output.append("<td>" + root.getTextContent() + "</td>");
+//	} else {
+//		this.output.append("<table><tr>");
+//		NodeList children = root.getChildNodes();
+//		if (children.toString().compareToIgnoreCase(this.previousTags) != 0) {
+//			
+//			for (int i = 0; i < children.getLength(); i++) {
+//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+//					this.output.append("<th>" + children.item(i).getNodeName() + "</th>");
+//				}
+//			}
+//		} else {
+//			//this.output.append("<tr>");
+//		}
+//		
+//		this.output.append("</tr><tr>");
+//		
+//		for (int i = 0; i <children.getLength(); i++) {
+//			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+//				if (this.hasChildNodes(children.item(i))) {
+//					//this.output.append("<td><table><tr>");
+//					//this.output.append("<table>");
+//					this.output.append("<td>");
+//					this.convertXmlToHtml(children.item(i));
+//					this.output.append("</td>");
+//					//this.output.append("</td></tr></table><br/>");
+//					//this.output.append("</table>");
+//					
+//				} else {
+//					this.output.append("<td>" + children.item(i).getTextContent() + "</td>");
+//					
+//				}
+//			}
+//		}
+//		this.output.append("</tr></table><br/>");
+//	}
+//}
+//
