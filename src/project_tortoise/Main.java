@@ -168,8 +168,9 @@ public class Main {
 			Iterator iter = outputMap.entrySet().iterator();
 			while (iter.hasNext()) {
 				Map.Entry ent = (Map.Entry) iter.next();
-				System.out.print(ent.getKey() + ":");
+				System.out.print("\n" + ent.getKey() + "\n");
 				System.out.println(ent.getValue().toString());
+			
 			}
 			
 			//System.out.println("Root element: " + root.getNodeName());
@@ -397,27 +398,29 @@ public class Main {
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			this.outputMap.put(root.getNodeName(), 
 					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
-		
+
 			this.xmlValues.clear();
 			this.tagNames.clear();
 			
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
-			
+				NamedNodeMap attrs = child.getAttributes();
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
 						this.output.append("\n" + child.getNodeName() +"\n");
 						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
-						NamedNodeMap attrs = child.getAttributes();
+						
 						for (int j = 0; j < attrs.getLength(); j++) {
 							this.tagNames.add(attrs.item(j).getNodeName());
-							this.xmlValues.add(attrs.item(j).getTextContent());
 						}
 						
 						this.previousTags = child.getNodeName();
 						this.scene = false;
 					} else {
 						this.scene=true;
+					}
+					for (int j = 0; j < attrs.getLength(); j++) {
+						this.xmlValues.add(attrs.item(j).getTextContent());
 					}
 					this.convertXmlToCsv(child);
 				}
