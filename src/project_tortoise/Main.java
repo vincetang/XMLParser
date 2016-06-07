@@ -3,7 +3,6 @@ package project_tortoise;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -33,6 +32,8 @@ public class Main {
 	private ArrayList<String> xmlValues;
 	private String previousTags;
 	private boolean scene;
+	private Map<String, String> outputMap;
+	
 	
 	private StringBuilder output;
 	
@@ -94,6 +95,7 @@ public class Main {
 			this.output = new StringBuilder();
 			
 			Element root = doc.getDocumentElement();
+			this.outputMap = new HashMap<String, String>();
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
 			this.tagNames = new ArrayList<String>();
@@ -103,7 +105,19 @@ public class Main {
 						
 			//converToHTML(root);
 			
+			this.convertXmlToCsv(root);
+
+			Iterator iter = outputMap.entrySet().iterator();
+			while (iter.hasNext()) {
+				Map.Entry ent = (Map.Entry) iter.next();
+				System.out.print("\n" + ent.getKey() + "\n");
+				System.out.println(ent.getValue().toString());
 			
+			}
+			
+			//System.out.println("Root element: " + root.getNodeName());
+			
+//			makeTables(root);
 			//System.out.println(this.output);
 
 			Node cnsmr_phn_2 = getSubNodesWithAttributes(root).get(2);
@@ -388,34 +402,47 @@ public class Main {
 				if (!this.hasChildNodes(child)) {
 					this.tagNames.add(child.getNodeName());
 					this.xmlValues.add(child.getTextContent());
+					// add key:value -> nodeName: TextContent to hashmap in fileMap[root.getNodeName];
 				}
 			}
 			
-			if (!this.scene) {
-				this.output.append(String.join(", ", this.tagNames) + "\n");
+			if (!this.outputMap.containsKey(root.getNodeName())) {
+					this.output.append(String.join(", ", this.tagNames) + "\n");
+					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
+					
+					// generate hash map for type and insert in fileMap
+					// for each tag, create a key
 			}
-			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			
+			this.output.append(String.join(", ", this.xmlValues) + "\n");
+			//get hashmap entry for parent in type hashmap
+			// insert into second hashmap
+			// look at nullified tag and add <tag, ""> to keys/values
+			this.outputMap.put(root.getNodeName(), 
+					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
+
 			this.xmlValues.clear();
 			this.tagNames.clear();
 			
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
-			
+				NamedNodeMap attrs = child.getAttributes();
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
 						this.output.append("\n" + child.getNodeName() +"\n");
+						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
 						
-						NamedNodeMap attrs = child.getAttributes();
 						for (int j = 0; j < attrs.getLength(); j++) {
 							this.tagNames.add(attrs.item(j).getNodeName());
-							this.xmlValues.add(attrs.item(j).getTextContent());
 						}
 						
 						this.previousTags = child.getNodeName();
 						this.scene = false;
 					} else {
 						this.scene=true;
+					}
+					for (int j = 0; j < attrs.getLength(); j++) {
+						this.xmlValues.add(attrs.item(j).getTextContent());
 					}
 					this.convertXmlToCsv(child);
 				}
