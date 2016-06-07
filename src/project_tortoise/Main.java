@@ -246,6 +246,19 @@ public class Main {
 	}
 	
 	
+	public static ArrayList<Node> getChildrenWithTextContent(Node node) {
+		ArrayList<Node> children = getElementChildNodes(node);
+		ArrayList<Node> textChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.size(); i++) {
+			if (!children.get(i).getTextContent().isEmpty() && 
+				!children.get(i).getNodeName().equalsIgnoreCase("udp_field")) {
+				textChildren.add(children.get(i));
+			}
+		}
+		return textChildren;
+	}
+
 	// takes nullified element
 	public ArrayList<String> getNullifiedFieldNames(Node n){
 		ArrayList<Node> nullifiedFields = getSubNodesWithTextContent(n);
@@ -256,11 +269,6 @@ public class Main {
 		}
 		return fieldNames;
 	}
-	
-	public String cnsmrType(Node n){
-		return n.getAttributes().getNamedItem("type").getNodeValue();
-	}
-	
 	
 	public static ArrayList<Node> getSubNodesWithTextContent(Node node){
 		ArrayList<Node> subNodesTextContent = new ArrayList<Node>();
@@ -285,20 +293,10 @@ public class Main {
 		}
 		return subNodesTextContent;
 	}
-	
-	public static ArrayList<Node> getChildrenWithTextContent(Node node) {
-		ArrayList<Node> children = getElementChildNodes(node);
-		ArrayList<Node> textChildren = new ArrayList<Node>();
-		
-		for (int i = 0; i < children.size(); i++) {
-			if (!children.get(i).getTextContent().isEmpty() && 
-				!children.get(i).getNodeName().equalsIgnoreCase("udp_field")) {
-				textChildren.add(children.get(i));
-			}
-		}
-		return textChildren;
+
+	public String cnsmrType(Node n){
+		return n.getAttributes().getNamedItem("type").getNodeValue();
 	}
-	
 	
 	
 	public static String allAttributesAsString(Node n){
