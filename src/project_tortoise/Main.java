@@ -34,6 +34,7 @@ public class Main {
 	private boolean scene;
 	private Map<String, String> outputMap;
 	
+	
 	private StringBuilder output;
 	
 
@@ -386,16 +387,22 @@ public class Main {
 				if (!this.hasChildNodes(child)) {
 					this.tagNames.add(child.getNodeName());
 					this.xmlValues.add(child.getTextContent());
+					// add key:value -> nodeName: TextContent to hashmap in fileMap[root.getNodeName];
 				}
 			}
 			
 			if (!this.outputMap.containsKey(root.getNodeName())) {
 					this.output.append(String.join(", ", this.tagNames) + "\n");
 					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
+					
+					// generate hash map for type and insert in fileMap
+					// for each tag, create a key
 			}
 			
-			//System.out.println("*****" + this.xmlValues.toString().replace("[", "").replace("]", ""));//String.join(", ", this.xmlValues + "\n") + "*****");
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
+			//get hashmap entry for parent in type hashmap
+			// insert into second hashmap
+			// look at nullified tag and add <tag, ""> to keys/values
 			this.outputMap.put(root.getNodeName(), 
 					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
 
