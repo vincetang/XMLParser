@@ -160,9 +160,6 @@ public class Main {
 			
 			this.convertXmlToCsv(root);
 
-			
-
-			this.convertXmlToCsv(root);
 			System.out.println("Root element: " + root.getNodeName());
 			
 			makeTable(root);
