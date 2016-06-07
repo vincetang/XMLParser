@@ -293,7 +293,7 @@ public class Main {
 			
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() + "\n");
+						this.output.append("\n" + child.getNodeName() + child.getAttributes().toString() + "\n");
 						this.previousTags = child.getNodeName();
 						this.scene = false;
 					} else {
