@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.*;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +37,6 @@ public class Main {
 	private StringBuilder output;
 	
 	private ArrayList<String> labels = new ArrayList<String>();
-	private ArrayList<String> typesSeen = new ArrayList<String>();
 	
 	public boolean validateInput(String filename, String type) {
 		
@@ -165,7 +165,7 @@ public class Main {
 
 			System.out.println("Root element: " + root.getNodeName());
 			
-			makeTable(root);
+			makeTables(root);
 
 //			System.out.println(this.output);
 
@@ -173,103 +173,21 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-	
 
-	public void makeTable(Node root){
-		ArrayList<Node> nodes = getSubNodesWithAttributes(root);
+	
+	public void makeTables(Node root){
+		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
+		ArrayList<String> typesSeen = new ArrayList<String>();
 		Node curr;
+		String type;
+		// cnsmr type : html code for table as string
+		Map output = new HashMap();
 		
-		//for each make a table
-		for (int i=0; i < nodes.size(); i++){
-			curr = nodes.get(i);
-			allAttributesAsString(curr);			
+		for (int i=0; i < tableRoots.size(); i++){
+			curr = tableRoots.get(i);
 		}
-
 	}
-	
-	public String cnsmrType(Node n){
-		return n.getAttributes().getNamedItem("type").getNodeValue();
-	}
-	
-	public static String allAttributesAsString(Node n){
-		StringBuilder output = new StringBuilder();
-		Node currAtt;
-		NamedNodeMap attributes = n.getAttributes();
 		
-		for (int i=0; i < attributes.getLength(); i++){
-			currAtt = attributes.item(i);
-			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
-		}
-		
-		System.out.println(output);
-		
-		return output.toString();
-	}
-	
-	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
-		ArrayList<Node> subNodesWithAtt = new ArrayList<Node>();
-		ArrayList<Node> childrenWithAtt = new ArrayList<Node>();
-		ArrayList<Node> children = getElementChildNodes(node);
-		
-		if (!node.hasChildNodes()){
-			return subNodesWithAtt;
-		}
-		
-		childrenWithAtt = getChildrenWithAttributes(node);
-		subNodesWithAtt.addAll(childrenWithAtt);
-		if (childrenWithAtt.size()>0){
-			//for each child with att, look for children that may have att
-			for (int i=0; i < childrenWithAtt.size(); i++){
-				subNodesWithAtt.addAll(getSubNodesWithAttributes(childrenWithAtt.get(i)));
-			}
-		} else {
-			for (int i=0; i < children.size(); i++){
-				subNodesWithAtt.addAll(getSubNodesWithAttributes(children.get(i)));
-			}
-		}
-//		
-//		for (int i = 0; i < subNodesWithAtt.size(); i ++){
-//			System.out.println(subNodesWithAtt.get(i).getNodeName());
-//		}
-		
-		return subNodesWithAtt;
-	}
-	
-	
-	//Excludes UDP elements
-	public static ArrayList<Node> getChildrenWithAttributes(Node node) {
-		NodeList children = node.getChildNodes();
-		ArrayList<Node> attChildren = new ArrayList<Node>();
-		
-		for (int i = 0; i < children.getLength(); i++) {
-			if (children.item(i).hasAttributes() && !children.item(i).getNodeName().equalsIgnoreCase("udp_field")) {
-				attChildren.add(children.item(i));
-			}
-		}
-		return attChildren;
-	}
-	
-	//return NodeList of children that are elements
-	public static ArrayList<Node> getElementChildNodes(Node node) {
-		NodeList children = node.getChildNodes();
-		ArrayList<Node> elementChildren = new ArrayList<Node>();
-		
-		for (int i = 0; i < children.getLength(); i++) {
-			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-				elementChildren.add(children.item(i));
-			}
-		}
-		return elementChildren;
-	}
-	
-	public void getLabels(Node root){
-		//if has an element as a child, it is a label
-		//if has text as child, it is value
-	}
-	
-	
-	
-	
 	public void convertXmlToCsv(Node root) {
 		/* for children of root {
 		 * 	if child has no children
@@ -327,6 +245,85 @@ public class Main {
 		}
 	}
 	
+
+	
+
+	//*************************************************************
+	//   HELPERS
+	//*************************************************************
+	
+	
+	public String cnsmrType(Node n){
+		return n.getAttributes().getNamedItem("type").getNodeValue();
+	}
+	
+	public static String allAttributesAsString(Node n){
+		StringBuilder output = new StringBuilder();
+		Node currAtt;
+		NamedNodeMap attributes = n.getAttributes();
+		
+		for (int i=0; i < attributes.getLength(); i++){
+			currAtt = attributes.item(i);
+			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
+		}
+		
+		System.out.println(output);
+		
+		return output.toString();
+	}
+	
+	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
+		ArrayList<Node> subNodesWithAtt = new ArrayList<Node>();
+		ArrayList<Node> childrenWithAtt = new ArrayList<Node>();
+		ArrayList<Node> children = getElementChildNodes(node);
+		
+		if (!node.hasChildNodes()){
+			return subNodesWithAtt;
+		}
+		
+		childrenWithAtt = getChildrenWithAttributes(node);
+		subNodesWithAtt.addAll(childrenWithAtt);
+		if (childrenWithAtt.size()>0){
+			//for each child with att, look for children that may have att
+			for (int i=0; i < childrenWithAtt.size(); i++){
+				subNodesWithAtt.addAll(getSubNodesWithAttributes(childrenWithAtt.get(i)));
+			}
+		} else {
+			for (int i=0; i < children.size(); i++){
+				subNodesWithAtt.addAll(getSubNodesWithAttributes(children.get(i)));
+			}
+		}
+		
+		return subNodesWithAtt;
+	}
+	
+	
+	//Excludes UDP elements
+	public static ArrayList<Node> getChildrenWithAttributes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> attChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).hasAttributes() && !children.item(i).getNodeName().equalsIgnoreCase("udp_field")) {
+				attChildren.add(children.item(i));
+			}
+		}
+		return attChildren;
+	}
+	
+	//return ArrayList<Node> children that are elements
+	public static ArrayList<Node> getElementChildNodes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> elementChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				elementChildren.add(children.item(i));
+			}
+		}
+		return elementChildren;
+	}
+	
 	public boolean hasChildNodes(Node node) {
 		NodeList children = node.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -337,24 +334,28 @@ public class Main {
 		return false;
 	}
 	
-	public static void allNodes(Node curr2){
-		
-		NodeList children = curr2.getChildNodes();
-		Node curr; 
-		
-		for (int i =0; i<children.getLength(); i++) {
-			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-				curr = children.item(i);
-				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
-				if(curr.hasChildNodes()){
-					allNodes(curr);
-				}
-			}
-		}
-		
-	}
+//	public static void allNodes(Node curr2){
+//		
+//		NodeList children = curr2.getChildNodes();
+//		Node curr; 
+//		
+//		for (int i =0; i<children.getLength(); i++) {
+//			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+//				curr = children.item(i);
+//				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
+//				if(curr.hasChildNodes()){
+//					allNodes(curr);
+//				}
+//			}
+//		}	
+//	}
 
-
+	
+	
+	
+	
+	
+	
 	// input: Main.class schema.xsd file1.xml file2.xml...
 	public static void main(String[] args) {
 		Main m = new Main();
