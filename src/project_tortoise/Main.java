@@ -358,60 +358,47 @@ public class Main {
 	
 	
 	public void convertXmlToCsv(Node root) {
-		/* for children of root {
-		 * 	if child has no children
-		 * 		add to tags
-		 * 		add to values
-		 * }
-		 * output tags,
-		 * output values
-		 * 
-		 * for children of root {
-		 * 	if child has children
-		 * 		output child tag (if not-seen)
-		 * 		recursve on child
-		 * }
-		 *  	
-		 * 
-		 * 
-		 */
-		boolean seen = false;
+
+		// root has no children
 		if (!this.hasChildNodes(root)) {
-			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
-		} else {
+			this.output.append(root.getNodeName() + "\n" + root.getTextContent()); //output content and tag name
+		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
 			
+			// iterate children, if child has no children then pull it's tag and value and add to arrays
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
 				
 				if (!this.hasChildNodes(child)) {
 					this.tagNames.add(child.getNodeName());
-					this.xmlValues.add(child.getTextContent());
-					// add key:value -> nodeName: TextContent to hashmap in fileMap[root.getNodeName];
+					this.xmlValues.add(child.getTextContent()); 
+					// getTagNames: insert value into correct index of getTagNames array
+					
 				}
 			}
 			
-			if (!this.outputMap.containsKey(root.getNodeName())) {
+			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
+			if (!this.outputMap.containsKey(root.getNodeName())) { // first time seeing this tag
 					this.output.append(String.join(", ", this.tagNames) + "\n");
 					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
-					
-					// generate hash map for type and insert in fileMap
-					// for each tag, create a key
+					// getTagNames: create array of tags (getTagNames) and output the string to the key
+					// getTagNames: create array of values of same size
 			}
 			
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
-			//get hashmap entry for parent in type hashmap
-			// insert into second hashmap
-			// look at nullified tag and add <tag, ""> to keys/values
 			this.outputMap.put(root.getNodeName(), 
 					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
-
+			
+			// reset values/tags
 			this.xmlValues.clear();
 			this.tagNames.clear();
 			
+			// iterate children 
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
 				NamedNodeMap attrs = child.getAttributes();
+				
+				// if node has children, get attributes and recurse over children
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
 						this.output.append("\n" + child.getNodeName() +"\n");
