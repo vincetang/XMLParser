@@ -155,8 +155,8 @@ public class Main {
 			Element root = doc.getDocumentElement();
 			this.tagNodes = new ArrayList<Node>();
 			this.xmlValues = new ArrayList<String>();
+			this.tagNames = new ArrayList<String>();
 			this.previousTags = "";
-
 
 //			this.convertXmlToCsv(root);
 //			System.out.println("Root element: " + root.getNodeName());
@@ -293,8 +293,6 @@ public class Main {
 		 * 
 		 * 
 		 */
-		this.tagNames = new ArrayList<String>();
-		this.xmlValues = new ArrayList<String>();
 		boolean seen = false;
 		if (!this.hasChildNodes(root)) {
 			this.output.append(root.getNodeName() + "\n" + root.getTextContent());
@@ -315,12 +313,22 @@ public class Main {
 			}
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
 			
+			this.xmlValues.clear();
+			this.tagNames.clear();
+			
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
 			
 				if (this.hasChildNodes(child)) {
 					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() + allAttributesAsString(child) + "\n");
+						this.output.append("\n" + child.getNodeName() +"\n");
+						
+						NamedNodeMap attrs = child.getAttributes();
+						for (int j = 0; j < attrs.getLength(); j++) {
+							this.tagNames.add(attrs.item(j).getNodeName());
+							this.xmlValues.add(attrs.item(j).getTextContent());
+						}
+						
 						this.previousTags = child.getNodeName();
 						this.scene = false;
 					} else {
