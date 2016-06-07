@@ -367,6 +367,21 @@ public class Main {
 		return elementChildren;
 	}
 
+	// Returns all of a node's attribute tags, child tags, and nullified tags
+	public  ArrayList<String> getAllColumnHeaders(Node node) {
+		ArrayList<String> tags = new ArrayList<String>();
+		NamedNodeMap nodeAttributes = node.getAttributes();
+		
+		// get attributes
+		for (int i = 0; i < nodeAttributes.getLength(); i++) {
+			tags.add(nodeAttributes.item(i).getNodeName());
+		}
+		
+		// get children tags (including nullified
+		tags.addAll(this.getCnsmrNodeNames(node));
+
+		return tags;
+	}
 
 	
 	
@@ -392,6 +407,7 @@ public class Main {
 			
 			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
 			if (!this.outputMap.containsKey(root.getNodeName())) { // first time seeing this tag
+					System.out.println("*******" + root.getNodeName() + ": " + this.getAllColumnHeaders(root) + "******");
 					this.output.append(String.join(", ", this.tagNames) + "\n");
 					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
 					// getTagNames: create array of tags (getTagNames) and output the string to the key
