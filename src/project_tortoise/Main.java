@@ -3,6 +3,7 @@ package project_tortoise;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -33,10 +34,11 @@ public class Main {
 	private String previousTags;
 	private boolean scene;
 	private Map<String, String> outputMap;
-	
-	
+	private ArrayList<String> columnHeaders;
+	private HashMap<String, String> tagValues;
 	private StringBuilder output;
-	
+	private ArrayList<String> columnHeaderArray;
+	private HashMap<String, ArrayList<String>> columnHeaderMap;
 
 	private ArrayList<String> labels = new ArrayList<String>();
 	
@@ -100,7 +102,9 @@ public class Main {
 			this.xmlValues = new ArrayList<String>();
 			this.tagNames = new ArrayList<String>();
 			this.previousTags = "";
-
+			this.columnHeaders = new ArrayList<String>();
+			this.tagValues = new HashMap<String, String>();
+			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
 //			this.convertXmlToCsv(root);
 						
 			//converToHTML(root);
@@ -388,8 +392,8 @@ public class Main {
 	public void convertXmlToCsv(Node root) {
 
 		// root has no children
-		if (!this.hasChildNodes(root)) {
-			this.output.append(root.getNodeName() + "\n" + root.getTextContent()); //output content and tag name
+		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {//!this.hasChildNodes(root)) {
+//			this.output.append(root.getNodeName() + "\n" + root.getTextContent()); //output content and tag name
 		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
 			
@@ -400,51 +404,88 @@ public class Main {
 				if (!this.hasChildNodes(child)) {
 					this.tagNames.add(child.getNodeName());
 					this.xmlValues.add(child.getTextContent()); 
+					this.tagValues.put(child.getNodeName(), child.getTextContent());
 					// getTagNames: insert value into correct index of getTagNames array
 					
 				}
 			}
-			
 			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
 			if (!this.outputMap.containsKey(root.getNodeName())) { // first time seeing this tag
-					System.out.println("*******" + root.getNodeName() + ": " + this.getAllColumnHeaders(root) + "******");
-					this.output.append(String.join(", ", this.tagNames) + "\n");
-					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
+					
+//					this.output.append(String.join(", ", this.tagNames) + "\n");
+//					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
+
+
+					this.columnHeaderArray = this.getAllColumnHeaders(root);
+					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
+//					System.out.println("****** Node: " + root.getNodeName() + " columnHeadersArray: " + this.columnHeaderArray.toString().replace("[", "").replace("]", ""));
+					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "") + "\n");
 					// getTagNames: create array of tags (getTagNames) and output the string to the key
 					// getTagNames: create array of values of same size
 			}
+			// Double check we have the right headers
+			this.columnHeaderArray = this.columnHeaderMap.get(root.getNodeName());
+			String[] columnValues = new String[this.columnHeaderArray.size()];
+			
+			for (int i = 0; i < this.columnHeaderArray.size(); i++) {
+				String columnHeader = this.columnHeaderArray.get(i);
+				if (this.tagValues.containsKey(columnHeader)) {
+					columnValues[i] = this.tagValues.get(columnHeader);
+				} else {
+					columnValues[i] = "";
+				}
+			}
+	
+			// Attributes
+			NamedNodeMap attrs = root.getAttributes();
+			
+			for (int k = 0; k < attrs.getLength(); k++) {
+				Node attribute = attrs.item(k);
+				int indexOfAttr = this.columnHeaderArray.indexOf(attribute.getNodeName());
+				columnValues[indexOfAttr] = attribute.getTextContent();
+			}
+			
+			// Values of children tags (and fill nullified tags with "")
+//			System.out.println("******** columnValues: " + Arrays.toString(columnValues).replace("[", "").replace("]", ""));
+			if (columnValues.length > 0) {
+				this.outputMap.put(root.getNodeName(), 
+						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "") + "\n");
+			} else {
+				this.outputMap.put(root.getNodeName(), this.outputMap.get(root.getNodeName()) + "" + "\n");
+			}
 			
 			this.output.append(String.join(", ", this.xmlValues) + "\n");
-			this.outputMap.put(root.getNodeName(), 
-					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
+//			this.outputMap.put(root.getNodeName(), 
+//					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
 			
 			// reset values/tags
+			this.tagValues.clear();
 			this.xmlValues.clear();
 			this.tagNames.clear();
 			
 			// iterate children 
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
-				NamedNodeMap attrs = child.getAttributes();
+//				NamedNodeMap attrs = child.getAttributes();
 				
 				// if node has children, get attributes and recurse over children
 				if (this.hasChildNodes(child)) {
-					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() +"\n");
-						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
-						
-						for (int j = 0; j < attrs.getLength(); j++) {
-							this.tagNames.add(attrs.item(j).getNodeName());
-						}
-						
-						this.previousTags = child.getNodeName();
-						this.scene = false;
-					} else {
-						this.scene=true;
-					}
-					for (int j = 0; j < attrs.getLength(); j++) {
-						this.xmlValues.add(attrs.item(j).getTextContent());
-					}
+//					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
+//						this.output.append("\n" + child.getNodeName() +"\n");
+//						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
+//						
+//						for (int j = 0; j < attrs.getLength(); j++) {
+//							this.tagNames.add(attrs.item(j).getNodeName());
+//						}
+//						
+//						this.previousTags = child.getNodeName();
+//						this.scene = false;
+//					} else {
+//						this.scene=true;
+//					}
+//					for (int j = 0; j < attrs.getLength(); j++) {
+//						this.xmlValues.add(attrs.item(j).getTextContent());
+//					}
 					this.convertXmlToCsv(child);
 				}
 			}
