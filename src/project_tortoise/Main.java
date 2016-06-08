@@ -135,7 +135,7 @@ public class Main {
 		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry e = (Map.Entry) iter.next();
-			System.out.println("<h1>" + e.getKey() + "</h1><br>" +e.getValue() +"<br><br>");
+			System.out.println("<h1>" + e.getKey() + "</h1>" +e.getValue() +"<br><br>");
 		}
 				
 	}
