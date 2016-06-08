@@ -3,6 +3,7 @@ package project_tortoise;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -27,16 +28,10 @@ public class Main {
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
 	
-	private ArrayList<Node> tagNodes;
-	private ArrayList<String> tagNames;
-	private ArrayList<String> xmlValues;
-	private String previousTags;
-	private boolean scene;
 	private Map<String, String> outputMap;
-	
-	
-	private StringBuilder output;
-	
+	private HashMap<String, String> tagValues;
+	private ArrayList<String> columnHeaderArray;
+	private HashMap<String, ArrayList<String>> columnHeaderMap;
 
 	private ArrayList<String> labels = new ArrayList<String>();
 	
@@ -50,10 +45,10 @@ public class Main {
 			else
 				this.xsdSchemaFile = f;
 
-			System.out.println("Read in file: " + filename);
+			//System.out.println("Read in file: " + filename);
 			return true;
 		} else {
-			System.out.println(filename + " not found. Omitting file.");
+			//System.out.println(filename + " not found. Omitting file.");
 			return false;
 		}
 	}
@@ -92,16 +87,11 @@ public class Main {
 			Document doc = builder.parse(xmlFile);
 			doc.getDocumentElement().normalize();
 
-			this.output = new StringBuilder();
 			
 			Element root = doc.getDocumentElement();
 			this.outputMap = new HashMap<String, String>();
-			this.tagNodes = new ArrayList<Node>();
-			this.xmlValues = new ArrayList<String>();
-			this.tagNames = new ArrayList<String>();
-			this.previousTags = "";
-
-//			this.convertXmlToCsv(root);
+			this.tagValues = new HashMap<String, String>();
+			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
 						
 			convertToHTML(root);
 			
@@ -115,9 +105,7 @@ public class Main {
 //			
 //			}
 			
-			//System.out.println("Root element: " + root.getNodeName());
-			
-			//System.out.println(this.output);
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -140,12 +128,14 @@ public class Main {
 			
 			addNewTableRow(curr);	
 		}
+
+		closeTables();
+		
 		
 		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry e = (Map.Entry) iter.next();
-			
-			System.out.println(e.getValue());
+			System.out.println("<h1>" + e.getKey() + "</h1><br>" +e.getValue() +"<br><br>");
 		}
 				
 	}
@@ -224,10 +214,16 @@ public class Main {
 		mapTypeToCnsmrTables.put(type, table);
 
 	}
-//	
-//	public void closeTables(){
-//		
-//	}
+	
+	public void closeTables(){
+		StringBuilder value;
+		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry e = (Map.Entry) iter.next();
+			value = (StringBuilder) e.getValue();
+			e.setValue(value + "</table>");
+		}
+	}
 
 
 	//*************************************************************
@@ -388,14 +384,29 @@ public class Main {
 		return elementChildren;
 	}
 
+	// Returns all of a node's attribute tags, child tags, and nullified tags
+	public  ArrayList<String> getAllColumnHeaders(Node node) {
+		ArrayList<String> tags = new ArrayList<String>();
+		NamedNodeMap nodeAttributes = node.getAttributes();
+		
+		// get attributes
+		for (int i = 0; i < nodeAttributes.getLength(); i++) {
+			tags.add(nodeAttributes.item(i).getNodeName());
+		}
+		
+		// get children tags (including nullified
+		tags.addAll(this.getCnsmrNodeNames(node));
+
+		return tags;
+	}
 
 	
 	
 	public void convertXmlToCsv(Node root) {
 
 		// root has no children
-		if (!this.hasChildNodes(root)) {
-			this.output.append(root.getNodeName() + "\n" + root.getTextContent()); //output content and tag name
+		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {//!this.hasChildNodes(root)) {
+			// do nothing
 		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
 			
@@ -404,52 +415,57 @@ public class Main {
 				Node child = children.get(i);
 				
 				if (!this.hasChildNodes(child)) {
-					this.tagNames.add(child.getNodeName());
-					this.xmlValues.add(child.getTextContent()); 
-					// getTagNames: insert value into correct index of getTagNames array
+					this.tagValues.put(child.getNodeName(), child.getTextContent());
 					
 				}
 			}
-			
 			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
-			if (!this.outputMap.containsKey(root.getNodeName())) { // first time seeing this tag
-					this.output.append(String.join(", ", this.tagNames) + "\n");
-					this.outputMap.put(root.getNodeName(), this.tagNames.toString().replace("[", "").replace("]", "") + "\n");
-					// getTagNames: create array of tags (getTagNames) and output the string to the key
-					// getTagNames: create array of values of same size
+			if (!this.outputMap.containsKey(root.getNodeName())) {
+					this.columnHeaderArray = this.getAllColumnHeaders(root);
+					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
+					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "") + "\n");
 			}
 			
-			this.output.append(String.join(", ", this.xmlValues) + "\n");
-			this.outputMap.put(root.getNodeName(), 
-					this.outputMap.get(root.getNodeName()) + this.xmlValues.toString().replace("[", "").replace("]", "") + "\n");
+			// Double check we have the right headers
+			this.columnHeaderArray = this.columnHeaderMap.get(root.getNodeName());
+			String[] columnValues = new String[this.columnHeaderArray.size()];
 			
+			// Align values with headers
+			for (int i = 0; i < this.columnHeaderArray.size(); i++) {
+				String columnHeader = this.columnHeaderArray.get(i);
+				if (this.tagValues.containsKey(columnHeader)) {
+					columnValues[i] = this.tagValues.get(columnHeader);
+				} else {
+					columnValues[i] = "";
+				}
+			}
+	
+			// Attributes
+			NamedNodeMap attrs = root.getAttributes();
+			
+			for (int k = 0; k < attrs.getLength(); k++) {
+				Node attribute = attrs.item(k);
+				int indexOfAttr = this.columnHeaderArray.indexOf(attribute.getNodeName());
+				columnValues[indexOfAttr] = attribute.getTextContent();
+			}
+			
+			// Values of children tags (and fill nullified tags with "")
+			if (columnValues.length > 0) {
+				this.outputMap.put(root.getNodeName(), 
+						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "") + "\n");
+			} else {
+				this.outputMap.put(root.getNodeName(), this.outputMap.get(root.getNodeName()) + "" + "\n");
+			}
+
 			// reset values/tags
-			this.xmlValues.clear();
-			this.tagNames.clear();
+			this.tagValues.clear();
 			
-			// iterate children 
+			// iterate children for recursion
 			for (int i = 0; i < children.size(); i++) {
 				Node child = children.get(i);
-				NamedNodeMap attrs = child.getAttributes();
-				
-				// if node has children, get attributes and recurse over children
+
+				// recurse over child
 				if (this.hasChildNodes(child)) {
-					if (this.previousTags.compareToIgnoreCase(child.getNodeName()) != 0) {
-						this.output.append("\n" + child.getNodeName() +"\n");
-						//this.outputMap.put(child.getNodeName(),  new StringBuilder(""));
-						
-						for (int j = 0; j < attrs.getLength(); j++) {
-							this.tagNames.add(attrs.item(j).getNodeName());
-						}
-						
-						this.previousTags = child.getNodeName();
-						this.scene = false;
-					} else {
-						this.scene=true;
-					}
-					for (int j = 0; j < attrs.getLength(); j++) {
-						this.xmlValues.add(attrs.item(j).getTextContent());
-					}
 					this.convertXmlToCsv(child);
 				}
 			}
@@ -502,7 +518,7 @@ public class Main {
 		String xsdFileName = args[0];
 		if (xsdFileName.matches("(?i).*.xsd")) {
 			if (m.validateInput(xsdFileName,  "xsd")) {
-				System.out.println("xsd found");
+				//System.out.println("xsd found");
 			} else {
 				return;
 			}
@@ -523,8 +539,8 @@ public class Main {
 			}	
 		}
 		
-		System.out.println("xml files: " + m.xmlFiles.size());
-		System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
+		//System.out.println("xml files: " + m.xmlFiles.size());
+		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 		for (File f: m.xmlFiles) {
 			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
