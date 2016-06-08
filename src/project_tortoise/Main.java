@@ -1,8 +1,11 @@
 package project_tortoise;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -93,18 +96,19 @@ public class Main {
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
 						
-			convertToHTML(root);
 			
-			//this.convertXmlToCsv(root);
+			this.convertXmlToCsv(root);
 
-//			Iterator iter = outputMap.entrySet().iterator();
-//			while (iter.hasNext()) {
-//				Map.Entry ent = (Map.Entry) iter.next();
-//				System.out.print("\n" + ent.getKey() + "\n");
-//				System.out.println(ent.getValue().toString());
-//			
-//			}
+			Iterator iter = outputMap.entrySet().iterator();
+			while (iter.hasNext()) {
+				Map.Entry ent = (Map.Entry) iter.next();
+				System.out.print("\n" + ent.getKey() + "\n");
+				System.out.println(ent.getValue().toString());
 			
+			}
+			
+			convertToHTML(root);
+
 
 
 		} catch (Exception e) {
@@ -131,12 +135,37 @@ public class Main {
 
 		closeTables();
 		
-		
+		File out = new File("out.html");
+		StringBuilder str = new StringBuilder(); 
 		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
 		while(iter.hasNext()){
 			Map.Entry e = (Map.Entry) iter.next();
-			System.out.println("<h1>" + e.getKey() + "</h1>" +e.getValue() +"<br><br>");
+			str.append("<h1>" + e.getKey() + "</h1>" +e.getValue() +"<br><br>");
 		}
+		
+		try {
+
+
+			File file = new File("out.html");
+
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(str.toString());
+			bw.close();
+
+			System.out.println("Done");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// write to file
+		
 				
 	}
 	
