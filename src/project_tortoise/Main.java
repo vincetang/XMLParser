@@ -103,103 +103,127 @@ public class Main {
 
 //			this.convertXmlToCsv(root);
 						
-			//converToHTML(root);
+			convertToHTML(root);
 			
-			this.convertXmlToCsv(root);
+			//this.convertXmlToCsv(root);
 
-			Iterator iter = outputMap.entrySet().iterator();
-			while (iter.hasNext()) {
-				Map.Entry ent = (Map.Entry) iter.next();
-				System.out.print("\n" + ent.getKey() + "\n");
-				System.out.println(ent.getValue().toString());
-			
-			}
+//			Iterator iter = outputMap.entrySet().iterator();
+//			while (iter.hasNext()) {
+//				Map.Entry ent = (Map.Entry) iter.next();
+//				System.out.print("\n" + ent.getKey() + "\n");
+//				System.out.println(ent.getValue().toString());
+//			
+//			}
 			
 			//System.out.println("Root element: " + root.getNodeName());
 			
-//			makeTables(root);
 			//System.out.println(this.output);
 
-			Node cnsmr_phn_2 = getSubNodesWithAttributes(root).get(2);
-			ArrayList<Node> cnsmr_phn_2_children = getElementChildNodes(cnsmr_phn_2);
-			
-			System.out.println(getNullifiedFieldNames(cnsmr_phn_2_children.get(0)));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private Map mapTypeToCnsmrTables = new HashMap(); // cnsmr type : cnsmr hashmap for table as string
-	private Map mapTypeToValuePositions = new HashMap();
+	private Map mapTypeToValuePositions = new HashMap(); //cnsmr type: list of tag names
 	
-	public void converToHTML(Node root){
+	public void convertToHTML(Node root){
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
 		Node curr; 
-		Map currMap;
+		
 		
 		for (int i=0; i < tableRoots.size(); i++){
-			
 			curr = tableRoots.get(i);
+			if(!(mapTypeToValuePositions.containsKey(cnsmrType(curr)))){
+				startNewTable(curr);
+			}
 			
-//			if (mapTypeToCnsmrTables.containsKey(cnsmrType(curr))){
-//				// add new row
-//				
-//			} else {
-//				// create new cnsmr table
-//			}
+			addNewTableRow(curr);	
 		}
 		
+		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry e = (Map.Entry) iter.next();
+			
+			System.out.println(e.getValue());
+		}
+				
 	}
 	
 	
 	
 	
-//	
-//	public void makeNewHTMLTable(Node n){
-//		String type = cnsmrType(n);
-//		StringBuilder table = new StringBuilder();
-//		String text;
-//		
-//		ArrayList<String> labels = getCnsmrNodeNames(n);
-//		ArrayList<String> textContent = getCnsmrTextNodeValues(n);
-//
-//		table.append("<table border=1px>");
-//		table.append("<tr>");
-//		for (int i=0; i < labels.size(); i++){
-//			table.append("<th>"+labels.get(i)+"</th>");
-//		}
-//		table.append("</tr><tr>");
-//		for (int i= 0; i < textContent.size(); i++){
-//			if (textContent.get(i).isEmpty()){
-//				text = "null";
-//			} else {
-//				text = textContent.get(i);
-//			}
-//			table.append("<td>" + text + "</td>");
-//		}
-//		table.append("</tr>");		
-//		//insert type and table into mapCnsmrTypeTable 
-//		mapCnsmrTypeTable.put(type, table);
-//	}
-//
-//	public void addNewTableRow(Node n){
-//		StringBuilder table = (StringBuilder) mapCnsmrTypeTable.get(cnsmrType(n));
-//		ArrayList<String> textContent = getCnsmrTextNodeValues(n);
-//		String text;
-//		
-//		table.append("<tr>");
-//		for (int i= 0; i < textContent.size(); i++){
-//			if (textContent.get(i).isEmpty()){
-//				text = "null";
-//			} else {
-//				text = textContent.get(i);
-//			}
-//			table.append("<td>" + text + "</td>");
-//		}
-//		table.append("</tr>");	
-//
-//		
-//	}
+	
+	public void startNewTable(Node n){
+		String type = cnsmrType(n);
+		StringBuilder table = new StringBuilder();
+	
+		ArrayList<String> labels = getCnsmrNodeNames(n);
+		
+		mapTypeToValuePositions.put(type, labels);
+	
+		table.append("<table border=1px>");
+		table.append("<tr>");
+		for (int i=0; i < labels.size(); i++){
+			table.append("<th>"+labels.get(i)+"</th>");
+		}
+		table.append("</tr>");
+		mapTypeToCnsmrTables.put(type, table);
+
+	}
+	
+
+	public void addNewTableRow(Node n){
+		StringBuilder row = new StringBuilder();
+		String type = cnsmrType(n);
+		String currCol;
+		String currValue;
+		int insertPos;
+
+		//retrieve the HTML for table you are appending row to
+		StringBuilder table = (StringBuilder) mapTypeToCnsmrTables.get(type);
+		
+		//retrieve label list for input order
+		ArrayList<String> columnHeaders = (ArrayList<String>) mapTypeToValuePositions.get(type);
+
+		//get elements inside record
+		ArrayList<Node> fields = getElementChildNodes(n);
+				
+		row.append("<tr>");
+		
+		Object[] values = new Object[columnHeaders.size()];
+		
+		
+		for (int i = 0; i < fields.size() ;i++){
+			
+			currCol = fields.get(i).getNodeName();
+			currValue = fields.get(i).getTextContent();
+			
+			//get position
+			insertPos = columnHeaders.indexOf(currCol);	
+			
+			if (insertPos < 0){
+				continue;
+			} else {
+				values[insertPos]="<td>"+currValue+"</td>";
+			}
+		}
+		
+		for (int i=0; i<values.length; i++){
+			if (values[i]==null){
+				values[i]="<td>null</td>";
+			}
+		}
+		
+		List<Object> listValues= Arrays.asList(values);
+		
+		
+		row.append(listValues.toString().replace("[", "").replace("]", "").replace(",", ""));
+		row.append("</tr>");
+		table.append(row);
+		mapTypeToCnsmrTables.put(type, table);
+
+	}
 //	
 //	public void closeTables(){
 //		
@@ -210,10 +234,7 @@ public class Main {
 	//   HELPERS
 	//*************************************************************
 	
-	public void makeNewCnsmrMap(){
-		
-	}
-	
+
 	public ArrayList<String> getCnsmrTextNodeValues(Node n){
 		ArrayList<String> textNodeValues = new ArrayList<String>();
 		ArrayList<Node> nodes = getElementChildNodes(n);
@@ -260,10 +281,10 @@ public class Main {
 	}
 
 	// takes nullified element
-	public ArrayList<String> getNullifiedFieldNames(Node n){
+	public ArrayList<String> getNullifiedFieldNames (Node n){
+		
 		ArrayList<Node> nullifiedFields = getSubNodesWithTextContent(n);
 		ArrayList<String> fieldNames = new ArrayList<String>();
-		
 		for (int i = 0; i < nullifiedFields.size(); i++){
 			fieldNames.add(nullifiedFields.get(i).getTextContent());
 		}
