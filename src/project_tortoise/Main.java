@@ -115,10 +115,14 @@ public class Main {
 				
 			} else if (this.format.equalsIgnoreCase("-h")){
 				// html
-				convertToHTML(root);
+				String name = xmlFile.getName();
+				int pos = name.lastIndexOf(".");
+				String outname = name.substring(0, pos);
+				convertToHTML(root, outname);
 			} else {
 				// tab delimited
 			}
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,7 +132,7 @@ public class Main {
 	private Map mapTypeToCnsmrTables = new HashMap(); // cnsmr type : cnsmr hashmap for table as string
 	private Map mapTypeToValuePositions = new HashMap(); //cnsmr type: list of tag names
 	
-	public void convertToHTML(Node root){
+	public void convertToHTML(Node root, String outName){
 		
 		
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
@@ -147,7 +151,6 @@ public class Main {
 		closeTables();
 		
 		
-		File out = new File("out.html");
 		StringBuilder str = new StringBuilder(); 
 		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
 		while(iter.hasNext()){
@@ -158,7 +161,7 @@ public class Main {
 		try {
 
 
-			File file = new File("out.html");
+			File file = new File(outName + ".html");
 
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
