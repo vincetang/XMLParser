@@ -107,7 +107,7 @@ public class Main {
 			
 			}
 			
-			convertToHTML(root);
+			//convertToHTML(root);
 
 
 
@@ -452,7 +452,7 @@ public class Main {
 			if (!this.outputMap.containsKey(root.getNodeName())) {
 					this.columnHeaderArray = this.getAllColumnHeaders(root);
 					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
-					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "") + "\n");
+					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
 			}
 			
 			// Double check we have the right headers
@@ -481,7 +481,7 @@ public class Main {
 			// Values of children tags (and fill nullified tags with "")
 			if (columnValues.length > 0) {
 				this.outputMap.put(root.getNodeName(), 
-						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "") + "\n");
+						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", "\t") + "\n");
 			} else {
 				this.outputMap.put(root.getNodeName(), this.outputMap.get(root.getNodeName()) + "" + "\n");
 			}
@@ -546,11 +546,12 @@ public class Main {
 		
 		String xsdFileName = args[0];
 		if (xsdFileName.matches("(?i).*.xsd")) {
-			if (m.validateInput(xsdFileName,  "xsd")) {
+			//if (m.validateInput(xsdFileName,  "xsd")) {
 				//System.out.println("xsd found");
-			} else {
-				return;
-			}
+			//} else {
+			//	System.out.println("Error finding or processing XSD.");
+			//	return;
+			//}
 		} else {
 			System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
 			return;
