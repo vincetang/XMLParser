@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -126,11 +128,13 @@ public class Main {
 				try {
 
 					File file;
-					
+					DateFormat dateFormat = new SimpleDateFormat("MMMdd_HHmmss");
+					Date date = new Date();
+					String strDate = dateFormat.format(date);
 					if (this.format.equalsIgnoreCase("-c")) {
-						file = new File(this.outname + ".csv");
+						file = new File(this.outname + "_" + strDate + ".csv");
 					} else {
-						file = new File(this.outname + ".txt");
+						file = new File(this.outname + "_" + strDate + ".txt");
 					}
 
 					// if file doesnt exists, then create it
@@ -188,8 +192,10 @@ public class Main {
 		
 		try {
 
-
-			File file = new File(outName + ".html");
+			DateFormat dateFormat = new SimpleDateFormat("MMMdd_HHmmss");
+			Date date = new Date();
+			String strDate = dateFormat.format(date);
+			File file = new File(outName + "_" + strDate + ".html");
 
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
