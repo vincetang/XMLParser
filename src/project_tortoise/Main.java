@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 
 public class Main {
 
+	private String delimitChar;
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
 	
@@ -432,7 +433,7 @@ public class Main {
 	
 	
 	public void convertXmlToCsv(Node root) {
-
+		
 		// root has no children
 		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {//!this.hasChildNodes(root)) {
 			// do nothing
@@ -452,7 +453,7 @@ public class Main {
 			if (!this.outputMap.containsKey(root.getNodeName())) {
 					this.columnHeaderArray = this.getAllColumnHeaders(root);
 					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
-					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
+					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			}
 			
 			// Double check we have the right headers
@@ -481,7 +482,7 @@ public class Main {
 			// Values of children tags (and fill nullified tags with "")
 			if (columnValues.length > 0) {
 				this.outputMap.put(root.getNodeName(), 
-						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", "\t") + "\n");
+						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			} else {
 				this.outputMap.put(root.getNodeName(), this.outputMap.get(root.getNodeName()) + "" + "\n");
 			}
@@ -572,6 +573,7 @@ public class Main {
 		//System.out.println("xml files: " + m.xmlFiles.size());
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
+		m.delimitChar = "\t";
 		for (File f: m.xmlFiles) {
 			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
 			
