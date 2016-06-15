@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 public class Main {
 	
+	private String outname;
 	private String format;
 	private String delimitChar;
 	private ArrayList<File> xmlFiles;
@@ -99,28 +100,55 @@ public class Main {
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
 			
-			
-			if (this.format.equalsIgnoreCase("-c")){
-				// csv format
-				
+
+			String name = xmlFile.getName();
+			int pos = name.lastIndexOf(".");
+			this.outname = name.substring(0, pos);
+							
+			if (this.format.equalsIgnoreCase("-h")){
+				// html
+				convertToHTML(root, outname);
+			} else {
+				// tab or comma delimited
 				this.convertXmlToCsv(root);
 
+				StringBuilder delimitOutput = new StringBuilder();
 				Iterator iter = outputMap.entrySet().iterator();
 				while (iter.hasNext()) {
 					Map.Entry ent = (Map.Entry) iter.next();
-					System.out.print("\n" + ent.getKey() + "\n");
-					System.out.println(ent.getValue().toString());
+					delimitOutput.append("\n" + ent.getKey() + "\n");
+					delimitOutput.append(ent.getValue().toString());
+//					System.out.print("\n" + ent.getKey() + "\n");
+//					System.out.println(ent.getValue().toString());
 				
 				}
 				
-			} else if (this.format.equalsIgnoreCase("-h")){
-				// html
-				String name = xmlFile.getName();
-				int pos = name.lastIndexOf(".");
-				String outname = name.substring(0, pos);
-				convertToHTML(root, outname);
-			} else {
-				// tab delimited
+				try {
+
+					File file;
+					
+					if (this.format.equalsIgnoreCase("-c")) {
+						file = new File(this.outname + ".csv");
+					} else {
+						file = new File(this.outname + ".txt");
+					}
+
+					// if file doesnt exists, then create it
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+
+					FileWriter fw = new FileWriter(file.getAbsoluteFile());
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write(delimitOutput.toString());
+					bw.close();
+
+					System.out.println("Done");
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
 			}
 
 
