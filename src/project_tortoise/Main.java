@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
+import java.text.Format;
 import java.util.*;
 
 import javax.xml.XMLConstants;
@@ -27,7 +28,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
 public class Main {
-
+	
+	private String format;
 	private String delimitChar;
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
@@ -96,21 +98,27 @@ public class Main {
 			this.outputMap = new HashMap<String, String>();
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
-						
 			
-			this.convertXmlToCsv(root);
+			
+			if (this.format.equalsIgnoreCase("-c")){
+				// csv format
+				
+				this.convertXmlToCsv(root);
 
-			Iterator iter = outputMap.entrySet().iterator();
-			while (iter.hasNext()) {
-				Map.Entry ent = (Map.Entry) iter.next();
-				System.out.print("\n" + ent.getKey() + "\n");
-				System.out.println(ent.getValue().toString());
-			
+				Iterator iter = outputMap.entrySet().iterator();
+				while (iter.hasNext()) {
+					Map.Entry ent = (Map.Entry) iter.next();
+					System.out.print("\n" + ent.getKey() + "\n");
+					System.out.println(ent.getValue().toString());
+				
+				}
+				
+			} else if (this.format.equalsIgnoreCase("-h")){
+				// html
+				convertToHTML(root);
+			} else {
+				// tab delimited
 			}
-			
-			//convertToHTML(root);
-
-
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,6 +129,8 @@ public class Main {
 	private Map mapTypeToValuePositions = new HashMap(); //cnsmr type: list of tag names
 	
 	public void convertToHTML(Node root){
+		
+		
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
 		Node curr; 
 		
@@ -135,6 +145,7 @@ public class Main {
 		}
 
 		closeTables();
+		
 		
 		File out = new File("out.html");
 		StringBuilder str = new StringBuilder(); 
@@ -545,21 +556,31 @@ public class Main {
 			return;
 		}
 		
-		String xsdFileName = args[0];
-		if (xsdFileName.matches("(?i).*.xsd")) {
-			//if (m.validateInput(xsdFileName,  "xsd")) {
-				//System.out.println("xsd found");
-			//} else {
-			//	System.out.println("Error finding or processing XSD.");
-			//	return;
-			//}
+		
+		
+		int xsdIndex;
+		if (args[0].startsWith("-")){
+			m.format = args[0];
+			xsdIndex = 2;
 		} else {
-			System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
-			return;
+			xsdIndex = 1;
+			String xsdFileName = args[0];
+			if (xsdFileName.matches("(?i).*.xsd")) {
+				//if (m.validateInput(xsdFileName,  "xsd")) {
+					//System.out.println("xsd found");
+				//} else {
+				//	System.out.println("Error finding or processing XSD.");
+				//	return;
+				//}
+			} else {
+				System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
+				return;
+			}
 		}
 		
+
 		String filename;
-		for (int i = 1; i < args.length; i++) {
+		for (int i = xsdIndex; i < args.length; i++) {
 			filename = args[i];
 			if (filename.matches("(?i).*.xml")) {
 				m.validateInput(filename, "xml");
@@ -573,7 +594,14 @@ public class Main {
 		//System.out.println("xml files: " + m.xmlFiles.size());
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
-		m.delimitChar = "\t";
+
+		if (m.format.equals("-c")){
+			m.delimitChar = ",";
+		} else {
+			m.delimitChar = "\t";
+		}
+			
+		
 		for (File f: m.xmlFiles) {
 			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
 			
@@ -583,6 +611,8 @@ public class Main {
 			//TODO: Output formatted CVS
 			
 		}
+		
+
 		return;
 	}
 
