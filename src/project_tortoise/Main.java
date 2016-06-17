@@ -126,9 +126,9 @@ public class Main {
 					Date date = new Date();
 					String strDate = dateFormat.format(date);
 					if (this.format.equalsIgnoreCase("-c")) {
-						file = new File(this.outname + "_" + strDate + ".csv");
+						file = new File(this.outName + "_" + strDate + ".csv");
 					} else {
-						file = new File(this.outname + "_" + strDate + ".txt");
+						file = new File(this.outName + "_" + strDate + ".txt");
 					}
 
 					// if file doesnt exists, then create it
