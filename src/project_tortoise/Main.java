@@ -478,6 +478,12 @@ public class Main {
 		return tags;
 	}
 
+	//given file, returns filename as string without extension
+	public String filenameWithoutExtension(File f){
+		String name = f.getName();
+		int pos = name.lastIndexOf(".");
+		return name.substring(0, pos);
+	}
 	
 	
 	public void convertXmlToCsv(Node root) {
