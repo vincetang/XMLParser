@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 public class Main {
 	
 	private String outname;
-	private String format;
+	private String format = "-t";
 	private String delimitChar;
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
@@ -41,8 +41,6 @@ public class Main {
 	private HashMap<String, String> tagValues;
 	private ArrayList<String> columnHeaderArray;
 	private HashMap<String, ArrayList<String>> columnHeaderMap;
-
-	private ArrayList<String> labels = new ArrayList<String>();
 	
 	public boolean validateInput(String filename, String type) {
 		
@@ -156,27 +154,56 @@ public class Main {
 		}
 	}
 
+	//*************************************************************
+	//   XSD
+	//*************************************************************
+	private ArrayList<String> xsdHeaders = new ArrayList<String>();
+	
+	public Map<String, String> xsdNodeInfo(Node n){
+		Map<String, String> info = new HashMap<String, String>();
+		
+		//get name
+		info.put("element type", n.getNodeName());
+		
+		//get attributes
+		NamedNodeMap atts = n.getAttributes();
+		Node att;
+		String currNodeName;
+		
+		for (int i=0; i < atts.getLength(); i++){
+			att = atts.item(i);
+			currNodeName = att.getNodeName();
+			info.put(currNodeName, att.getNodeValue());
+			
+			if (!xsdHeaders.contains(currNodeName)){
+				xsdHeaders.add(currNodeName);
+			}
+		}
+		return info;
+	}
+
+	//*************************************************************
+	//   HTML
+	//*************************************************************
+	
+
 	private Map mapTypeToCnsmrTables = new HashMap(); // cnsmr type : cnsmr hashmap for table as string
-	private Map mapTypeToValuePositions = new HashMap(); //cnsmr type: list of tag names
+	private Map<String, ArrayList<String>> mapTypeToValuePositions = new HashMap(); //cnsmr type: list of tag names
 	
 	public void convertToHTML(Node root, String outName){
-		
-		
+				
 		ArrayList<Node> tableRoots = getSubNodesWithAttributes(root);
-		Node curr; 
-		
+		Node curr; 	
 		
 		for (int i=0; i < tableRoots.size(); i++){
 			curr = tableRoots.get(i);
 			if(!(mapTypeToValuePositions.containsKey(cnsmrType(curr)))){
 				startNewTable(curr);
-			}
-			
+			}		
 			addNewTableRow(curr);	
 		}
 
-		closeTables();
-		
+		closeTables();		
 		
 		StringBuilder str = new StringBuilder(); 
 		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
@@ -207,15 +234,8 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		// write to file
-		
-				
+			
 	}
-	
-	
-	
-	
 	
 	public void startNewTable(Node n){
 		String type = cnsmrType(n);
@@ -280,7 +300,6 @@ public class Main {
 		
 		List<Object> listValues= Arrays.asList(values);
 		
-		
 		row.append(listValues.toString().replace("[", "").replace("]", "").replace(",", ""));
 		row.append("</tr>");
 		table.append(row);
@@ -288,17 +307,7 @@ public class Main {
 
 	}
 	
-	public void closeTables(){
-		StringBuilder value;
-		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
-		while(iter.hasNext()){
-			Map.Entry e = (Map.Entry) iter.next();
-			value = (StringBuilder) e.getValue();
-			e.setValue(value + "</table>");
-		}
-	}
-
-
+	
 	//*************************************************************
 	//   HELPERS
 	//*************************************************************
@@ -441,10 +450,10 @@ public class Main {
 		return attChildren;
 	}
 	
-
 	
-	//return ArrayList<Node> children that are elements
 	public static ArrayList<Node> getElementChildNodes(Node node) {
+		//return ArrayList<Node> children that are elements
+
 		NodeList children = node.getChildNodes();
 		ArrayList<Node> elementChildren = new ArrayList<Node>();
 		
@@ -456,8 +465,8 @@ public class Main {
 		return elementChildren;
 	}
 
-	// Returns all of a node's attribute tags, child tags, and nullified tags
 	public  ArrayList<String> getAllColumnHeaders(Node node) {
+		// Returns all of a node's attribute tags, child tags, and nullified tags
 		ArrayList<String> tags = new ArrayList<String>();
 		NamedNodeMap nodeAttributes = node.getAttributes();
 		
@@ -472,28 +481,13 @@ public class Main {
 		return tags;
 	}
 
-	//given file, returns filename as string without extension
 	public String filenameWithoutExtension(File f){
+		//given file, returns filename as string without extension
 		String name = f.getName();
 		int pos = name.lastIndexOf(".");
 		return name.substring(0, pos);
 	}
 	
-	public Map<String, String> xsdNodeInfo(Node n){
-		Map<String, String> info = new HashMap<String, String>();
-		
-		//get name
-		info.put("element type", n.getNodeName());
-		
-		//get attributes
-		NamedNodeMap atts = n.getAttributes();
-		Node att;
-		for (int i=0; i < atts.getLength(); i++){
-			att = atts.item(i);
-			info.put(att.getNodeName(), att.getNodeValue());
-		}
-		return info;
-	}
 	
 	
 	public void convertXmlToCsv(Node root) {
@@ -576,6 +570,17 @@ public class Main {
 		}
 		return false;
 	}
+	
+	public void closeTables(){
+		StringBuilder value;
+		Iterator iter = mapTypeToCnsmrTables.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry e = (Map.Entry) iter.next();
+			value = (StringBuilder) e.getValue();
+			e.setValue(value + "</table>");
+		}
+	}
+
 	
 //	public static void allNodes(Node curr2){
 //		
