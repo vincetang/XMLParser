@@ -191,7 +191,7 @@ public class Main {
 		}
 		
 		try {
-
+			
 			DateFormat dateFormat = new SimpleDateFormat("MMMdd_HHmmss");
 			Date date = new Date();
 			String strDate = dateFormat.format(date);
@@ -501,7 +501,7 @@ public class Main {
 			if (!this.outputMap.containsKey(root.getNodeName())) {
 					this.columnHeaderArray = this.getAllColumnHeaders(root);
 					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
-					this.outputMap.put(root.getNodeName(), this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+					this.outputMap.put(root.getNodeName(), "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			}
 			
 			// Double check we have the right headers
