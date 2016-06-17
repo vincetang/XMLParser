@@ -101,15 +101,10 @@ public class Main {
 			this.outputMap = new HashMap<String, String>();
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
-			
-
-			String name = xmlFile.getName();
-			int pos = name.lastIndexOf(".");
-			this.outname = name.substring(0, pos);
 							
 			if (this.format.equalsIgnoreCase("-h")){
 				// html
-				convertToHTML(root, outname);
+				convertToHTML(root, filenameWithoutExtension(xmlFile));
 			} else {
 				// tab or comma delimited
 				this.convertXmlToCsv(root);
@@ -407,7 +402,6 @@ public class Main {
 	}
 	
 	
-	
 	public static ArrayList<Node> getSubNodesWithAttributes(Node node){
 		ArrayList<Node> subNodesWithAtt = new ArrayList<Node>();
 		ArrayList<Node> childrenWithAtt = new ArrayList<Node>();
@@ -483,6 +477,22 @@ public class Main {
 		String name = f.getName();
 		int pos = name.lastIndexOf(".");
 		return name.substring(0, pos);
+	}
+	
+	public Map<String, String> xsdNodeInfo(Node n){
+		Map<String, String> info = new HashMap<String, String>();
+		
+		//get name
+		info.put("element type", n.getNodeName());
+		
+		//get attributes
+		NamedNodeMap atts = n.getAttributes();
+		Node att;
+		for (int i=0; i < atts.getLength(); i++){
+			att = atts.item(i);
+			info.put(att.getNodeName(), att.getNodeValue());
+		}
+		return info;
 	}
 	
 	
@@ -661,66 +671,3 @@ public class Main {
 	}
 
 }
-
-
-//
-//public void convertXmlToHtml(Node root) {
-//	/*
-//	if have children nodes (elements)
-//		write <table><tr>
-//		
-//		for each child {
-//			write <th>child.getNodeName</th>
-//		}
-//		write </tr>
-//		write <tr>
-//		for each child {
-//			if child has no children
-//				write <td>value</td>
-//			else:
-//				write <table><tr> convertXmlToHtml(child) </tr></table>
-//		write </tr>
-//		<rite </table>
-//	else (no children)
-//		return <td>value</td>
-//	*/
-//	
-//	if (!this.hasChildNodes(root)) {
-//		this.output.append("<td>" + root.getTextContent() + "</td>");
-//	} else {
-//		this.output.append("<table><tr>");
-//		NodeList children = root.getChildNodes();
-//		if (children.toString().compareToIgnoreCase(this.previousTags) != 0) {
-//			
-//			for (int i = 0; i < children.getLength(); i++) {
-//				if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//					this.output.append("<th>" + children.item(i).getNodeName() + "</th>");
-//				}
-//			}
-//		} else {
-//			//this.output.append("<tr>");
-//		}
-//		
-//		this.output.append("</tr><tr>");
-//		
-//		for (int i = 0; i <children.getLength(); i++) {
-//			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//				if (this.hasChildNodes(children.item(i))) {
-//					//this.output.append("<td><table><tr>");
-//					//this.output.append("<table>");
-//					this.output.append("<td>");
-//					this.convertXmlToHtml(children.item(i));
-//					this.output.append("</td>");
-//					//this.output.append("</td></tr></table><br/>");
-//					//this.output.append("</table>");
-//					
-//				} else {
-//					this.output.append("<td>" + children.item(i).getTextContent() + "</td>");
-//					
-//				}
-//			}
-//		}
-//		this.output.append("</tr></table><br/>");
-//	}
-//}
-//
