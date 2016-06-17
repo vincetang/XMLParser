@@ -118,7 +118,7 @@ public class Main {
 				Iterator iter = outputMap.entrySet().iterator();
 				while (iter.hasNext()) {
 					Map.Entry ent = (Map.Entry) iter.next();
-					delimitOutput.append("\n" + ent.getKey() + "\n");
+					delimitOutput.append("\n" + "h\t" + ent.getKey() + "\n");
 					delimitOutput.append(ent.getValue().toString());
 //					System.out.print("\n" + ent.getKey() + "\n");
 //					System.out.println(ent.getValue().toString());
@@ -499,7 +499,10 @@ public class Main {
 			}
 			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
 			if (!this.outputMap.containsKey(root.getNodeName())) {
-					this.columnHeaderArray = this.getAllColumnHeaders(root);
+					this.columnHeaderArray = new ArrayList<String>();
+					this.columnHeaderArray.add("h");
+					this.columnHeaderArray.addAll(this.getAllColumnHeaders(root));
+//					this.columnHeaderArray = this.getAllColumnHeaders(root);
 					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
 					this.outputMap.put(root.getNodeName(), "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			}
@@ -508,11 +511,14 @@ public class Main {
 			this.columnHeaderArray = this.columnHeaderMap.get(root.getNodeName());
 			String[] columnValues = new String[this.columnHeaderArray.size()];
 			
+
 			// Align values with headers
 			for (int i = 0; i < this.columnHeaderArray.size(); i++) {
 				String columnHeader = this.columnHeaderArray.get(i);
 				if (this.tagValues.containsKey(columnHeader)) {
 					columnValues[i] = this.tagValues.get(columnHeader);
+				} else if (columnHeader.compareToIgnoreCase("h") == 0) {
+					columnValues[i] = "d";
 				} else {
 					columnValues[i] = "";
 				}
@@ -632,7 +638,8 @@ public class Main {
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 
-		XSDParser xsdParser = new XSDParser();
+		//XSDParser xsdParser = new XSDParser();
+		
 		if (m.format.equals("-c")){
 			m.delimitChar = ",";
 		} else {
