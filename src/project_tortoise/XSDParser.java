@@ -2,11 +2,14 @@ package project_tortoise;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -66,4 +69,45 @@ public class XSDParser {
 
 		return "";
 	}
+	
+	
+	
+	private ArrayList<String> xsdHeaders = new ArrayList<String>();
+	
+	public Map<String, String> xsdNodeInfo(Node n){
+		
+		/** 
+		 * Node -> HashMap of element type and attributes
+		 * e.g. 
+		 * INPUT:  <xs:element name="asst_id" type="xs:long" minOccurs="0" />
+		 * OUTPUT: {elt_type: "xs:element", 
+		 * 				name: "asst_id", 
+		 * 				type: "xs:long", 
+		 * 		   minOccurs: "0"}
+		 * @param node
+		 * @return
+		 */
+		
+		Map<String, String> info = new HashMap<String, String>();
+		
+		//add elt_type
+		info.put("element type", n.getNodeName());
+		
+		//add attributes 
+		NamedNodeMap atts = n.getAttributes();
+		Node att;
+		String currNodeName;
+		
+		for (int i=0; i < atts.getLength(); i++){
+			att = atts.item(i);
+			currNodeName = att.getNodeName();
+			info.put(currNodeName, att.getNodeValue());
+			
+			if (!xsdHeaders.contains(currNodeName)){
+				xsdHeaders.add(currNodeName);
+			}
+		}
+		return info;
+	}
+	
 }

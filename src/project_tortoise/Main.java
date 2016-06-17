@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 public class Main {
 	
-	private String outname;
+	private String outName;
 	private String format = "-t";
 	private String delimitChar;
 	private ArrayList<File> xmlFiles;
@@ -99,10 +99,11 @@ public class Main {
 			this.outputMap = new HashMap<String, String>();
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
-							
+			this.outName = filenameWithoutExtension(xmlFile);
+
 			if (this.format.equalsIgnoreCase("-h")){
 				// html
-				convertToHTML(root, filenameWithoutExtension(xmlFile));
+				convertToHTML(root, this.outName);
 			} else {
 				// tab or comma delimited
 				this.convertXmlToCsv(root);
@@ -152,34 +153,6 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	//*************************************************************
-	//   XSD
-	//*************************************************************
-	private ArrayList<String> xsdHeaders = new ArrayList<String>();
-	
-	public Map<String, String> xsdNodeInfo(Node n){
-		Map<String, String> info = new HashMap<String, String>();
-		
-		//get name
-		info.put("element type", n.getNodeName());
-		
-		//get attributes
-		NamedNodeMap atts = n.getAttributes();
-		Node att;
-		String currNodeName;
-		
-		for (int i=0; i < atts.getLength(); i++){
-			att = atts.item(i);
-			currNodeName = att.getNodeName();
-			info.put(currNodeName, att.getNodeValue());
-			
-			if (!xsdHeaders.contains(currNodeName)){
-				xsdHeaders.add(currNodeName);
-			}
-		}
-		return info;
 	}
 
 	//*************************************************************
