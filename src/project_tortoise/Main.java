@@ -632,6 +632,7 @@ public class Main {
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 
+		XSDParser xsdParser = new XSDParser();
 		if (m.format.equals("-c")){
 			m.delimitChar = ",";
 		} else {
