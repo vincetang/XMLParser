@@ -11,6 +11,8 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -37,7 +39,7 @@ public class Main {
 	private ArrayList<File> xmlFiles;
 	private File xsdSchemaFile;
 	
-	private Map<String, String> outputMap;
+	private LinkedHashMap<String, String> outputMap;
 	private HashMap<String, String> tagValues;
 	private ArrayList<String> columnHeaderArray;
 	private HashMap<String, ArrayList<String>> columnHeaderMap;
@@ -96,7 +98,7 @@ public class Main {
 
 			
 			Element root = doc.getDocumentElement();
-			this.outputMap = new HashMap<String, String>();
+			this.outputMap = new LinkedHashMap<String, String>();
 			this.tagValues = new HashMap<String, String>();
 			this.columnHeaderMap = new HashMap<String, ArrayList<String>>();
 			this.outName = filenameWithoutExtension(xmlFile);
@@ -110,10 +112,21 @@ public class Main {
 
 				StringBuilder delimitOutput = new StringBuilder();
 				Iterator iter = outputMap.entrySet().iterator();
+				String value ="";
 				while (iter.hasNext()) {
 					Map.Entry ent = (Map.Entry) iter.next();
-					delimitOutput.append("\n" + "h\t" + ent.getKey() + "\n");
-					delimitOutput.append(ent.getValue().toString());
+					
+					value = ent.getValue().toString();
+					System.out.println(value);
+					// only write header if it has values
+					// items without values contain [d,,,,]
+					Pattern pattern = Pattern.compile(".*\nd\t.+", Pattern.DOTALL);
+					Matcher matcher = pattern.matcher(value);
+					
+					if (matcher.matches()) {
+						delimitOutput.append("\n\n" + "h\t" + ent.getKey() + "\n");
+						delimitOutput.append(ent.getValue().toString());
+					}
 //					System.out.print("\n" + ent.getKey() + "\n");
 //					System.out.println(ent.getValue().toString());
 				
@@ -379,7 +392,7 @@ public class Main {
 			currAtt = attributes.item(i);
 			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
 		}
-		System.out.println(output);
+		//System.out.println(output);
 		return output.toString();
 	}
 	
@@ -461,7 +474,15 @@ public class Main {
 		return name.substring(0, pos);
 	}
 	
-	
+	public int countValues(String[] columnValues) {
+		int count = 0;
+		for (int i = 0; i < columnValues.length; i++) {
+			if ((columnValues[i] != null) && (columnValues[i].compareToIgnoreCase("") != 0)) {
+				count++;
+			}
+		}
+		return count;
+	}
 	
 	public void convertXmlToCsv(Node root) {
 		
@@ -517,7 +538,8 @@ public class Main {
 			}
 			
 			// Values of children tags (and fill nullified tags with "")
-			if (columnValues.length > 0) {
+			if (this.countValues(columnValues) > 1) { //countValues.size() > 0
+				//System.out.println(Arrays.toString(columnValues));
 				this.outputMap.put(root.getNodeName(), 
 						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			} else {
