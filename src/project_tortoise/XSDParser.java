@@ -3,6 +3,7 @@ package project_tortoise;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -74,21 +75,22 @@ public class XSDParser {
 	
 	private ArrayList<String> xsdHeaders = new ArrayList<String>();
 	
-	public Map<String, String> xsdNodeInfo(Node n){
+	public Map<String, String> getXsdNodeData(Node n){
 		
 		/** 
-		 * Node -> HashMap of element type and attributes
+		 * Node -> HashMap of all node data
 		 * e.g. 
 		 * INPUT:  <xs:element name="asst_id" type="xs:long" minOccurs="0" />
 		 * OUTPUT: {elt_type: "xs:element", 
 		 * 				name: "asst_id", 
 		 * 				type: "xs:long", 
 		 * 		   minOccurs: "0"}
+		 * xsdHeaders: Also creates list of all headers encountered and stores in xsdHeaders
 		 * @param node
 		 * @return
 		 */
 		
-		Map<String, String> info = new HashMap<String, String>();
+		Map<String, String> info = new LinkedHashMap<String, String>();
 		
 		//add elt_type
 		info.put("element type", n.getNodeName());
