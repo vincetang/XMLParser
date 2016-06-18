@@ -467,7 +467,7 @@ public class Main {
 		return tags;
 	}
 
-	public String filenameWithoutExtension(File f){
+	public static String filenameWithoutExtension(File f){
 		//given file, returns filename as string without extension
 		String name = f.getName();
 		int pos = name.lastIndexOf(".");

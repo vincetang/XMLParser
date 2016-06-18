@@ -1,6 +1,13 @@
 package project_tortoise;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +32,7 @@ public class XSDParser {
 	private StringBuilder output;
 	private ArrayList<String> headers;
 	private ArrayList<String> values;
+	private String outName;
 	
 	
 	/**
@@ -53,23 +61,89 @@ public class XSDParser {
 			if (seq == null){
 				return;
 			}
-			
+			xsdHeaders.add("element type");
 			ArrayList<Node> xsElementNodes = getChildrenWithName(seq, "xs:element");
+			ArrayList<Map<String, String>> xsdNodeData = new ArrayList<Map<String,String>>();
 			
 			if(xsElementNodes.isEmpty()){
 				return;
 			}
 			
 			for (int i=0; i<xsElementNodes.size();i++){
-				System.out.print(getXsdNodeData(xsElementNodes.get(i)).toString() + "\n");
+				xsdNodeData.add(getXsdNodeData(xsElementNodes.get(i)));
 			}
 			
-			//this.convertXsdToTabDelimited(document.getDocumentElement());
+			this.outName = Main.filenameWithoutExtension(f);
+			
+			writeOutput(xsdNodeData);
+
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	
+	public void writeOutput(ArrayList<Map<String,String>> xsdNodeData){
+		/**TO DO: write output
+		 * 		- first row headers
+		 * 		- get length of headers
+		 * 		- create array for new row
+		 * 		- for each in datamap, look up key index in headers, insert value into row at that index
+		**/
+
+		StringBuilder str = new StringBuilder(); 
+		
+		str.append("h\t");
+		str.append(xsdHeaders.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
+		
+		Map<String,String> currMap; 
+		for (int i=0; i<xsdNodeData.size();i++){
+			currMap = xsdNodeData.get(i);
+			String[] newRow = new String[xsdHeaders.size()];
+			
+			//iterate through each entry in map
+			
+		    Iterator it = currMap.entrySet().iterator();
+		    while (it.hasNext()) {
+		    	Map.Entry e = (Map.Entry) it.next();
+   	
+		    	newRow[xsdHeaders.indexOf(e.getKey())] = (String) e.getValue();
+		    	it.remove(); // avoids a ConcurrentModificationException
+		    }
+		    
+		    str.append("d\t");
+			str.append(String.join("\t", newRow)+ "\n");
+			
+		}
+
+		try {
+			
+			DateFormat dateFormat = new SimpleDateFormat("MMMdd_HHmmss");
+			Date date = new Date();
+			String strDate = dateFormat.format(date);
+			File file = new File(this.outName + "_" + strDate + ".txt");
+
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(str.toString());
+			bw.close();
+
+			System.out.println("Done");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+	
+	
+	
+	}
 	
 	/** 
 	 * Recursively looks at every element and stores its name, attribute, and type
@@ -113,7 +187,7 @@ public class XSDParser {
 		
 		//add elt_type
 		data.put("element type", n.getNodeName());
-		
+
 		//add attributes 
 		NamedNodeMap atts = n.getAttributes();
 		Node att;
@@ -135,8 +209,10 @@ public class XSDParser {
 		for (int i=0; i < subnodesWithAtts.size(); i++){
 			curr = subnodesWithAtts.get(i);
 			atts = curr.getAttributes();
-
 			data.put(curr.getNodeName(), atts.item(0).getNodeValue());
+			if (!xsdHeaders.contains(curr.getNodeName())){
+				xsdHeaders.add(curr.getNodeName());
+			}
 		}
 		
 		
