@@ -117,7 +117,7 @@ public class Main {
 					Map.Entry ent = (Map.Entry) iter.next();
 					
 					value = ent.getValue().toString();
-					System.out.println(value);
+					
 					// only write header if it has values
 					// items without values contain [d,,,,]
 					Pattern pattern = Pattern.compile(".*\nd\t.+", Pattern.DOTALL);
