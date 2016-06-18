@@ -603,12 +603,12 @@ public class Main {
 			xsdIndex = 1;
 			String xsdFileName = args[0];
 			if (xsdFileName.matches("(?i).*.xsd")) {
-				//if (m.validateInput(xsdFileName,  "xsd")) {
-					//System.out.println("xsd found");
-				//} else {
-				//	System.out.println("Error finding or processing XSD.");
-				//	return;
-				//}
+				if (m.validateInput(xsdFileName,  "xsd")) {
+					System.out.println("xsd found");
+				} else {
+					System.out.println("Error finding or processing XSD.");
+					return;
+				}
 			} else {
 				System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
 				return;
@@ -632,7 +632,8 @@ public class Main {
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
 
-		//XSDParser xsdParser = new XSDParser();
+		XSDParser xsdParser = new XSDParser();
+		xsdParser.parseFile(m.xsdSchemaFile);
 		
 		if (m.format.equals("-c")){
 			m.delimitChar = ",";
@@ -641,15 +642,15 @@ public class Main {
 		}
 			
 		
-		for (File f: m.xmlFiles) {
-			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
-			
-			//TODO: parse validated XML files
-			m.parseXML(f);
-
-			//TODO: Output formatted CVS
-			
-		}
+//		for (File f: m.xmlFiles) {
+//			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
+//			
+//			//TODO: parse validated XML files
+//			m.parseXML(f);
+//
+//			//TODO: Output formatted CVS
+//			
+//		}
 		
 
 		return;
