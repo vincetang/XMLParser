@@ -604,8 +604,8 @@ public class Main {
 
 	
 	
-	public void getAllXsdFiles() {
-		File currentDir = new File(".");
+	public void parseXsdTable(String path) {
+		File currentDir = new File(path);
 	
 		this.addDirectoryContents(currentDir);
 	}
@@ -650,22 +650,60 @@ public class Main {
 		 * 
 		 *  
 		 */
-		if (args.length == 1 ) {
-			String arg = args[0];
-			switch (arg.toLowerCase()) {
-			case "help":
-				System.out.println("Show Help");
-				break;
-			case "parsexsdtable":
-				System.out.println("parseXsdTable");
-				break;
-			}
-			System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
+		if (args.length == 0 || args[0].compareToIgnoreCase("help") == 0) {
+			System.out.println("Show Help");
 			return;
 		}
 		
+		int fileIndex;
+		String arg = args[0];
+		switch (arg.toLowerCase()) {
+		case "parsexsdtable":
+			String path;
+			if (args.length == 2) {
+				path = args[1];
+				System.out.println("Parsing xsd files in " + path + " and subdirectories");
+			} else {
+				path = ".";
+				System.out.println("Parsing xsd files in current directory and subdirectories");
+				
+			}
+			m.parseXsdTable(path);
+			break;
+		case "-v":
+			if (args.length < 3) {
+				System.out.println("Invalid arguments");
+				return;
+			}
+			
+			String xsdFileName = args[1];
+			if (xsdFileName.matches("(?i).*.xsd")) {
+				if (!m.validateInput(xsdFileName, "xsd")) {
+					System.out.println("Invalid xsd file: " + xsdFileName);
+					return;
+				}
+				//TODO: validate xml's against xsd's
+				System.out.println("Validating XSD files");	
+			} else {
+				System.out.println("Invalid xsd file provided: " + xsdFileName);
+			}
+			return;
+		case "-h":
+			m.format="-h";
+			break;
+		case "-c":
+			m.format="-c";
+			m.delimitChar = ",";
+			break;
+		default:
+			m.format="-t";
+			m.delimitChar = "\t";
+			break;
+		}
 		
+		System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
 		
+		/** OLD **/
 		int xsdIndex;
 		if (args[0].startsWith("-")){
 			m.format = args[0];
@@ -704,15 +742,16 @@ public class Main {
 		
 		m.xsdFileNames = new ArrayList<String>();
 		m.xsdFiles = new ArrayList<File>();
-		m.getAllXsdFiles();
+//		m.parseAllXsdTable();
 
-		System.out.println("Printing all XSD files in this folder and subfolders:");
-		for (int x = 0; x < m.xsdFiles.size(); x++) {
-			System.out.println("File Name: " + m.xsdFiles.get(x).getName());
-		}
+//		System.out.println("Printing all XSD files in this folder and subfolders:");
+//		for (int x = 0; x < m.xsdFiles.size(); x++) {
+//			System.out.println("File Name: " + m.xsdFiles.get(x).getName());
+//		}
+		
+		
 		XSDParser xsdParser = new XSDParser();
 		xsdParser.parseFile(m.xsdSchemaFile);
-		
 		if (m.format.equals("-c")){
 			m.delimitChar = ",";
 		} else {
