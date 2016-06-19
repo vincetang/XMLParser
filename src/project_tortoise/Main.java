@@ -637,7 +637,29 @@ public class Main {
 		Main m = new Main();
 		m.xmlFiles = new ArrayList<File>();
 		
-		if (args.length < 2) {
+		/** Sample inputs:
+		 * XMLParser parseXSDTable filepath
+		 * 		- Parses a table containing all elements and their attributes contained in all the 
+		 * 		xsd files in the directory "filepath" and subdirectories
+		 * XMLParser [-h,-c] file1.xml file2.xml...
+		 * 		no argument: generate tab-delimited representation of files
+		 * 		h: generate HTML representation of files
+		 * 		c: generate comma-separated representation of files
+		 * XMLParser -v schema.xsd file1.xml file2.xml...
+		 * 		v: validates each xml file against the xsd schema
+		 * 
+		 *  
+		 */
+		if (args.length == 1 ) {
+			String arg = args[0];
+			switch (arg.toLowerCase()) {
+			case "help":
+				System.out.println("Show Help");
+				break;
+			case "parsexsdtable":
+				System.out.println("parseXsdTable");
+				break;
+			}
 			System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
 			return;
 		}
