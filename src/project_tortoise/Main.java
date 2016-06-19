@@ -669,7 +669,7 @@ public class Main {
 				
 			}
 			m.parseXsdTable(path);
-			break;
+			return;
 		case "-v":
 			if (args.length < 3) {
 				System.out.println("Invalid arguments");
