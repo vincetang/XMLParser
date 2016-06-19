@@ -44,6 +44,9 @@ public class Main {
 	private ArrayList<String> columnHeaderArray;
 	private HashMap<String, ArrayList<String>> columnHeaderMap;
 	
+	private ArrayList<String> xsdFileNames;
+	private ArrayList<File> xsdFiles;
+	
 	public boolean validateInput(String filename, String type) {
 		
 		File f = new File(filename);
@@ -601,7 +604,29 @@ public class Main {
 
 	
 	
+	public void getAllXsdFileNames() {
+		File currentDir = new File(".");
 	
+		this.addDirectoryContents(currentDir);
+	}
+	
+	public void addDirectoryContents(File dir) {
+		try {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) { // is a sub-directory
+					this.addDirectoryContents(file);
+				} else { // is a file
+					if (dir.getName().matches("(?i).*.xsd")) {
+						//TODO: change this to call the XSD parser directly
+						this.xsdFiles.add(dir);
+					}
+				}
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	
@@ -653,6 +678,9 @@ public class Main {
 		//System.out.println("xml files: " + m.xmlFiles.size());
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
+		m.xsdFileNames = new ArrayList<String>();
+		m.xsdFiles = new ArrayList<File>();
+		m.getAllXsdFileNames();
 
 		XSDParser xsdParser = new XSDParser();
 		xsdParser.parseFile(m.xsdSchemaFile);
