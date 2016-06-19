@@ -123,7 +123,14 @@ public class Main {
 					
 					// only write header if it has values
 					// items without values contain [d,,,,]
-					Pattern pattern = Pattern.compile(".*\nd\t.+", Pattern.DOTALL);
+					String strPattern;
+					if (this.format.equalsIgnoreCase("-t")) {
+						strPattern = ".*\nd\t.+";
+					} else {
+						strPattern = ".*\nd, .+";
+					}
+
+					Pattern pattern = Pattern.compile(strPattern, Pattern.DOTALL);
 					Matcher matcher = pattern.matcher(value);
 					
 					if (matcher.matches()) {
@@ -696,7 +703,7 @@ public class Main {
 		case "-c":
 			fileIndex = 1;
 			m.format="-c";
-			m.delimitChar = ",";
+			m.delimitChar = ", ";
 			break;
 		default:
 			m.format="-t";
