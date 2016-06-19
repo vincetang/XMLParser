@@ -644,6 +644,17 @@ public class Main {
 		Main m = new Main();
 		m.xmlFiles = new ArrayList<File>();
 		
+		String help =
+				"Parser Help\n======"
+				+ "Sample inputs:\n"
+				+ "XMLParser parseXSDTable [filepath]\n"
+				+ "Builds a table of all xsd elements in the filepath specified (including subdirectories) or the current directory if a filepath is not specified.\n"
+				+ "XMLParser [-h,-c] file1.xml file2.xml...\n"
+				+ "no argument: generate tab-delimited representation of files\n"
+				+ "h: generate HTML representation of files\n"
+				+ "c: generate comma-separated representation of files"
+				+ "";
+				
 		/** Sample inputs:
 		 * XMLParser parseXSDTable filepath
 		 * 		- Parses a table containing all elements and their attributes contained in all the 
