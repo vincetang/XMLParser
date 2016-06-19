@@ -654,8 +654,8 @@ public class Main {
 			System.out.println("Show Help");
 			return;
 		}
-		
-		int fileIndex;
+
+		int fileIndex = 0;
 		String arg = args[0];
 		switch (arg.toLowerCase()) {
 		case "parsexsdtable":
@@ -689,9 +689,11 @@ public class Main {
 			}
 			return;
 		case "-h":
+			fileIndex = 1;
 			m.format="-h";
 			break;
 		case "-c":
+			fileIndex = 1;
 			m.format="-c";
 			m.delimitChar = ",";
 			break;
@@ -701,47 +703,63 @@ public class Main {
 			break;
 		}
 		
-		System.out.println("Too few arguments. Must be called in the following format Main.class *.xsd *.xml...");
-		
-		/** OLD **/
-		int xsdIndex;
-		if (args[0].startsWith("-")){
-			m.format = args[0];
-			xsdIndex = 2;
-		} else {
-			xsdIndex = 1;
-			String xsdFileName = args[0];
-			if (xsdFileName.matches("(?i).*.xsd")) {
-				if (m.validateInput(xsdFileName,  "xsd")) {
-					System.out.println("xsd found");
-				} else {
-					System.out.println("Error finding or processing XSD.");
-					return;
-				}
-			} else {
-				System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
-				return;
-			}
-		}
-		
-
 		String filename;
-		for (int i = xsdIndex; i < args.length; i++) {
+		for (int i = fileIndex; i < args.length; i++) {
 			filename = args[i];
 			if (filename.matches("(?i).*.xml")) {
 				m.validateInput(filename, "xml");
-			} else if (filename.matches("(?i).*.xsd")) {
-				System.out.println("Error with " + filename + ": Only 1 xsd can be passed and must be the first argument");
 			} else {
-				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml.");
+				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml");
 			}	
 		}
+		
+		for (File f: m.xmlFiles) {
+			System.out.print("Parsing " + f.getName() + "... ");
+			m.parseXML(f);
+		}
+		
+		System.out.println("Complete");
+		
+		/** OLD **/
+//		int xsdIndex;
+//		if (args[0].startsWith("-")){
+//			m.format = args[0];
+//			xsdIndex = 2;
+//		} else {
+//			xsdIndex = 1;
+//			String xsdFileName = args[0];
+//			if (xsdFileName.matches("(?i).*.xsd")) {
+//				if (m.validateInput(xsdFileName,  "xsd")) {
+//					System.out.println("xsd found");
+//				} else {
+//					System.out.println("Error finding or processing XSD.");
+//					return;
+//				}
+//			} else {
+//				System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
+//				return;
+//			}
+//		}
+		
+
+//		String filename;
+//		for (int i = xsdIndex; i < args.length; i++) {
+//			filename = args[i];
+//			if (filename.matches("(?i).*.xml")) {
+//				m.validateInput(filename, "xml");
+//			} else if (filename.matches("(?i).*.xsd")) {
+//				System.out.println("Error with " + filename + ": Only 1 xsd can be passed and must be the first argument");
+//			} else {
+//				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml.");
+//			}	
+//		}
+		
 		
 		//System.out.println("xml files: " + m.xmlFiles.size());
 		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
 		
-		m.xsdFileNames = new ArrayList<String>();
-		m.xsdFiles = new ArrayList<File>();
+//		m.xsdFileNames = new ArrayList<String>();
+//		m.xsdFiles = new ArrayList<File>();
 //		m.parseAllXsdTable();
 
 //		System.out.println("Printing all XSD files in this folder and subfolders:");
@@ -749,14 +767,14 @@ public class Main {
 //			System.out.println("File Name: " + m.xsdFiles.get(x).getName());
 //		}
 		
-		
-		XSDParser xsdParser = new XSDParser();
-		xsdParser.parseFile(m.xsdSchemaFile);
-		if (m.format.equals("-c")){
-			m.delimitChar = ",";
-		} else {
-			m.delimitChar = "\t";
-		}
+//	
+//		XSDParser xsdParser = new XSDParser();
+//		xsdParser.parseFile(m.xsdSchemaFile);
+//		if (m.format.equals("-c")){
+//			m.delimitChar = ",";
+//		} else {
+//			m.delimitChar = "\t";
+//		}
 			
 		
 //		for (File f: m.xmlFiles) {
