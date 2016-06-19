@@ -604,7 +604,7 @@ public class Main {
 
 	
 	
-	public void getAllXsdFileNames() {
+	public void getAllXsdFiles() {
 		File currentDir = new File(".");
 	
 		this.addDirectoryContents(currentDir);
@@ -682,7 +682,7 @@ public class Main {
 		
 		m.xsdFileNames = new ArrayList<String>();
 		m.xsdFiles = new ArrayList<File>();
-		m.getAllXsdFileNames();
+		m.getAllXsdFiles();
 
 		System.out.println("Printing all XSD files in this folder and subfolders:");
 		for (int x = 0; x < m.xsdFiles.size(); x++) {
