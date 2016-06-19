@@ -660,6 +660,7 @@ public class Main {
 		switch (arg.toLowerCase()) {
 		case "parsexsdtable":
 			String path;
+			m.xsdFiles = new ArrayList<File>();
 			if (args.length == 2) {
 				path = args[1];
 				System.out.println("Parsing xsd files in " + path + " and subdirectories");
