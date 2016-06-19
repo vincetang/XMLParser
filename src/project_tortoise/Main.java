@@ -617,9 +617,11 @@ public class Main {
 				if (file.isDirectory()) { // is a sub-directory
 					this.addDirectoryContents(file);
 				} else { // is a file
-					if (dir.getName().matches("(?i).*.xsd")) {
+					Pattern pattern = Pattern.compile("(?i).*.xsd", Pattern.DOTALL);
+					Matcher matcher = pattern.matcher(file.getName());
+					if (matcher.matches()) {
 						//TODO: change this to call the XSD parser directly
-						this.xsdFiles.add(dir);
+						this.xsdFiles.add(file);
 					}
 				}
 			} 
@@ -682,6 +684,10 @@ public class Main {
 		m.xsdFiles = new ArrayList<File>();
 		m.getAllXsdFileNames();
 
+		System.out.println("Printing all XSD files in this folder and subfolders:");
+		for (int x = 0; x < m.xsdFiles.size(); x++) {
+			System.out.println("File Name: " + m.xsdFiles.get(x).getName());
+		}
 		XSDParser xsdParser = new XSDParser();
 		xsdParser.parseFile(m.xsdSchemaFile);
 		
