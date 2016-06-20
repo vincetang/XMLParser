@@ -689,7 +689,7 @@ public class Main {
 					return;
 				}
 				File xsdFile = new File(xsdFileName);
-				//TODO: validate xml's against xsd's
+				
 				String filename;
 				for (int i = 2; i < args.length; i++) {
 					filename = args[i];
