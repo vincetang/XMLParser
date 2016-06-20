@@ -67,8 +67,14 @@ public class XSDParser {
 				return;
 			}
 			
-			xsdHeaders.add("filename");
-			xsdHeaders.add("element type");
+			
+			if (!xsdHeaders.contains("filename")){
+				xsdHeaders.add("filename");
+			}
+			
+			if (!xsdHeaders.contains("element type")){
+				xsdHeaders.add("element type");
+			}
 			ArrayList<Node> xsElementNodes = getChildrenWithName(seq, "xs:element");
 			
 			if(xsElementNodes.isEmpty()){
@@ -97,7 +103,6 @@ public class XSDParser {
 
 		StringBuilder str = new StringBuilder(); 
 		
-		str.append("filename\t");
 		str.append(xsdHeaders.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
 		
 		Map<String,String> currMap; 
