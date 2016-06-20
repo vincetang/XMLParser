@@ -93,7 +93,7 @@ public class XSDParser {
 
 		StringBuilder str = new StringBuilder(); 
 		
-		str.append("filename");
+		str.append("filename\t");
 		str.append(xsdHeaders.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
 		
 		Map<String,String> currMap; 
@@ -111,7 +111,7 @@ public class XSDParser {
 		    	it.remove(); // avoids a ConcurrentModificationException
 		    }
 		    
-		    str.append(this.outName);
+		    str.append(this.outName+"\t");
 			str.append(String.join("\t", newRow)+ "\n");
 			
 		}
