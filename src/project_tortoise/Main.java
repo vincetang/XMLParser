@@ -4,11 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -17,7 +13,6 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -43,9 +38,7 @@ public class Main {
 	private HashMap<String, String> tagValues;
 	private ArrayList<String> columnHeaderArray;
 	private HashMap<String, ArrayList<String>> columnHeaderMap;
-	
-	private ArrayList<String> xsdFileNames;
-	private ArrayList<File> xsdFiles;
+
 	
 	private XSDParser xsdParser;
 	
@@ -67,7 +60,7 @@ public class Main {
 		}
 	}
 	
-	static boolean validateXMLAgainstXSD(File xmlFile, File xsdFile) {
+	public boolean validateXMLAgainstXSD(File xmlFile, File xsdFile) {
 		try {
 			Source xmlSource = new StreamSource(xmlFile);
 			SchemaFactory factory =
@@ -631,8 +624,6 @@ public class Main {
 					Pattern pattern = Pattern.compile("(?i).*.xsd", Pattern.DOTALL);
 					Matcher matcher = pattern.matcher(file.getName());
 					if (matcher.matches()) {
-						//TODO: change this to call the XSD parser directly
-						//this.xsdFiles.add(file);
 						xsdParser.parseFile(file);
 					}
 				}
@@ -651,31 +642,19 @@ public class Main {
 		m.xmlFiles = new ArrayList<File>();
 		
 		String help =
-				"Parser Help\n======"
-				+ "Sample inputs:\n"
+				"Parser Help\n=========\n"
+				+ "Commands:\n"
 				+ "XMLParser parseXSDTable [filepath]\n"
-				+ "Builds a table of all xsd elements in the filepath specified (including subdirectories) or the current directory if a filepath is not specified.\n"
+				+ "\tBuilds a table of all xsd elements in the filepath specified (including subdirectories) or the current directory if a filepath is not specified.\n"
 				+ "XMLParser [-h,-c] file1.xml file2.xml...\n"
-				+ "no argument: generate tab-delimited representation of files\n"
-				+ "h: generate HTML representation of files\n"
-				+ "c: generate comma-separated representation of files"
-				+ "";
-				
-		/** Sample inputs:
-		 * XMLParser parseXSDTable filepath
-		 * 		- Parses a table containing all elements and their attributes contained in all the 
-		 * 		xsd files in the directory "filepath" and subdirectories
-		 * XMLParser [-h,-c] file1.xml file2.xml...
-		 * 		no argument: generate tab-delimited representation of files
-		 * 		h: generate HTML representation of files
-		 * 		c: generate comma-separated representation of files
-		 * XMLParser -v schema.xsd file1.xml file2.xml...
-		 * 		v: validates each xml file against the xsd schema
-		 * 
-		 *  
-		 */
+				+ "\tno argument: generate tab-delimited representation of files\n"
+				+ "\th: generate HTML representation of files\n"
+				+ "\tc: generate comma-separated representation of files\n"
+				+ "XMLParser -v schema.xsd file1.xml file2.xml...\n"
+				+ "\tv: validates each xml file against the xsd schema\n";
+
 		if (args.length == 0 || args[0].compareToIgnoreCase("help") == 0) {
-			System.out.println("Show Help");
+			System.out.println(help);
 			return;
 		}
 
@@ -686,7 +665,7 @@ public class Main {
 			m.xsdParser = new XSDParser();
 
 			String path;
-			m.xsdFiles = new ArrayList<File>();
+			
 			if (args.length == 2) {
 				path = args[1];
 				System.out.println("Parsing xsd files in " + path + " and subdirectories");
@@ -709,8 +688,26 @@ public class Main {
 					System.out.println("Invalid xsd file: " + xsdFileName);
 					return;
 				}
+				File xsdFile = new File(xsdFileName);
 				//TODO: validate xml's against xsd's
-				System.out.println("Validating XSD files");	
+				String filename;
+				for (int i = 2; i < args.length; i++) {
+					filename = args[i];
+					if (filename.matches("(?i).*.xml")) {
+						m.validateInput(filename, "xml");
+					} else {
+						System.out.println(filename + " has an invalid file name. Files must be in the format *.xml");
+						return;
+					}	
+				}
+				
+				for (File f: m.xmlFiles) {
+					if (!m.validateXMLAgainstXSD(f, xsdFile)) {
+						System.out.println("Validation failed for " + f.getName());
+						return;
+					}
+				}
+				System.out.println("All XML files have been validated against " + xsdFileName + " sucecssfully");	
 			} else {
 				System.out.println("Invalid xsd file provided: " + xsdFileName);
 			}
@@ -746,73 +743,6 @@ public class Main {
 		}
 		
 		System.out.println("Complete");
-		
-		/** OLD **/
-//		int xsdIndex;
-//		if (args[0].startsWith("-")){
-//			m.format = args[0];
-//			xsdIndex = 2;
-//		} else {
-//			xsdIndex = 1;
-//			String xsdFileName = args[0];
-//			if (xsdFileName.matches("(?i).*.xsd")) {
-//				if (m.validateInput(xsdFileName,  "xsd")) {
-//					System.out.println("xsd found");
-//				} else {
-//					System.out.println("Error finding or processing XSD.");
-//					return;
-//				}
-//			} else {
-//				System.out.println(xsdFileName + " is invalid. First argument must be in the format *.xsd.");
-//				return;
-//			}
-//		}
-		
-
-//		String filename;
-//		for (int i = xsdIndex; i < args.length; i++) {
-//			filename = args[i];
-//			if (filename.matches("(?i).*.xml")) {
-//				m.validateInput(filename, "xml");
-//			} else if (filename.matches("(?i).*.xsd")) {
-//				System.out.println("Error with " + filename + ": Only 1 xsd can be passed and must be the first argument");
-//			} else {
-//				System.out.println(filename + " has an invalid file name. Files must be in the format *.xml.");
-//			}	
-//		}
-		
-		
-		//System.out.println("xml files: " + m.xmlFiles.size());
-		//System.out.println("xsd scehma: " + m.xsdSchemaFile.getName());
-		
-//		m.xsdFileNames = new ArrayList<String>();
-//		m.xsdFiles = new ArrayList<File>();
-//		m.parseAllXsdTable();
-
-//		System.out.println("Printing all XSD files in this folder and subfolders:");
-//		for (int x = 0; x < m.xsdFiles.size(); x++) {
-//			System.out.println("File Name: " + m.xsdFiles.get(x).getName());
-//		}
-		
-//	
-//		XSDParser xsdParser = new XSDParser();
-//		xsdParser.parseFile(m.xsdSchemaFile);
-//		if (m.format.equals("-c")){
-//			m.delimitChar = ",";
-//		} else {
-//			m.delimitChar = "\t";
-//		}
-			
-		
-//		for (File f: m.xmlFiles) {
-//			//boolean result = m.validateXMLAgainstXSD(f, m.xsdSchemaFile);
-//			
-//			//TODO: parse validated XML files
-//			m.parseXML(f);
-//
-//			//TODO: Output formatted CVS
-//			
-//		}
 		
 
 		return;
