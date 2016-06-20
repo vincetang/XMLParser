@@ -33,6 +33,8 @@ public class XSDParser {
 	private ArrayList<String> headers;
 	private ArrayList<String> values;
 	private String outName;
+	private ArrayList<Map<String, String>> xsdNodeData = new ArrayList<Map<String,String>>();
+
 	
 	
 	/**
@@ -63,7 +65,6 @@ public class XSDParser {
 			}
 			xsdHeaders.add("element type");
 			ArrayList<Node> xsElementNodes = getChildrenWithName(seq, "xs:element");
-			ArrayList<Map<String, String>> xsdNodeData = new ArrayList<Map<String,String>>();
 			
 			if(xsElementNodes.isEmpty()){
 				return;
@@ -75,8 +76,6 @@ public class XSDParser {
 			
 			this.outName = Main.filenameWithoutExtension(f);
 			
-			writeOutput(xsdNodeData);
-
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -84,7 +83,7 @@ public class XSDParser {
 	}
 	
 	
-	public void writeOutput(ArrayList<Map<String,String>> xsdNodeData){
+	public void writeOutput(){
 		/**TO DO: write output
 		 * 		- first row headers
 		 * 		- get length of headers
@@ -94,7 +93,7 @@ public class XSDParser {
 
 		StringBuilder str = new StringBuilder(); 
 		
-		str.append("h\t");
+		str.append("filename");
 		str.append(xsdHeaders.toString().replace("[", "").replace("]", "").replace(",", "\t") + "\n");
 		
 		Map<String,String> currMap; 
@@ -112,7 +111,7 @@ public class XSDParser {
 		    	it.remove(); // avoids a ConcurrentModificationException
 		    }
 		    
-		    str.append("d\t");
+		    str.append(this.outName);
 			str.append(String.join("\t", newRow)+ "\n");
 			
 		}

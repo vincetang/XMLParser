@@ -611,6 +611,7 @@ public class Main {
 	}
 	
 	public void addDirectoryContents(File dir) {
+		XSDParser xsdParser = new XSDParser();
 		try {
 			File[] files = dir.listFiles();
 			for (File file : files) {
@@ -621,10 +622,13 @@ public class Main {
 					Matcher matcher = pattern.matcher(file.getName());
 					if (matcher.matches()) {
 						//TODO: change this to call the XSD parser directly
-						this.xsdFiles.add(file);
+						//this.xsdFiles.add(file);
+						xsdParser.parseFile(file);
 					}
 				}
 			} 
+			
+			xsdParser.writeOutput();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
