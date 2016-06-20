@@ -47,6 +47,8 @@ public class Main {
 	private ArrayList<String> xsdFileNames;
 	private ArrayList<File> xsdFiles;
 	
+	private XSDParser xsdParser;
+	
 	public boolean validateInput(String filename, String type) {
 		
 		File f = new File(filename);
@@ -615,10 +617,11 @@ public class Main {
 		File currentDir = new File(path);
 	
 		this.addDirectoryContents(currentDir);
+		xsdParser.writeOutput();
+
 	}
 	
 	public void addDirectoryContents(File dir) {
-		XSDParser xsdParser = new XSDParser();
 		try {
 			File[] files = dir.listFiles();
 			for (File file : files) {
@@ -635,7 +638,6 @@ public class Main {
 				}
 			} 
 			
-			xsdParser.writeOutput();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -681,6 +683,8 @@ public class Main {
 		String arg = args[0];
 		switch (arg.toLowerCase()) {
 		case "parsexsdtable":
+			m.xsdParser = new XSDParser();
+
 			String path;
 			m.xsdFiles = new ArrayList<File>();
 			if (args.length == 2) {

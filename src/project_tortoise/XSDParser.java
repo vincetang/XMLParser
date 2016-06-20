@@ -52,6 +52,9 @@ public class XSDParser {
 	
 	public void parseFile(File f) {
 		try {
+			
+			this.outName = Main.filenameWithoutExtension(f);
+
 			DocumentBuilderFactory docBuilderFactory = 
 					DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -63,6 +66,8 @@ public class XSDParser {
 			if (seq == null){
 				return;
 			}
+			
+			xsdHeaders.add("filename");
 			xsdHeaders.add("element type");
 			ArrayList<Node> xsElementNodes = getChildrenWithName(seq, "xs:element");
 			
@@ -74,7 +79,6 @@ public class XSDParser {
 				xsdNodeData.add(getXsdNodeData(xsElementNodes.get(i)));
 			}
 			
-			this.outName = Main.filenameWithoutExtension(f);
 			
 			
 		} catch (Exception e) {
@@ -111,7 +115,6 @@ public class XSDParser {
 		    	it.remove(); // avoids a ConcurrentModificationException
 		    }
 		    
-		    str.append(this.outName+"\t");
 			str.append(String.join("\t", newRow)+ "\n");
 			
 		}
@@ -183,6 +186,8 @@ public class XSDParser {
 		 */
 		
 		Map<String, String> data = new LinkedHashMap<String, String>();
+		
+		data.put("filename", this.outName);
 		
 		//add elt_type
 		data.put("element type", n.getNodeName());
