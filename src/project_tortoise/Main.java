@@ -52,10 +52,8 @@ public class Main {
 			else
 				this.xsdSchemaFile = f;
 
-			//System.out.println("Read in file: " + filename);
 			return true;
 		} else {
-			//System.out.println(filename + " not found. Omitting file.");
 			return false;
 		}
 	}
@@ -370,7 +368,6 @@ public class Main {
 			currAtt = attributes.item(i);
 			output.append(currAtt.getNodeName() + "=" + currAtt.getNodeValue() + " ");
 		}
-		//System.out.println(output);
 		return output.toString();
 	}
 	
@@ -484,7 +481,6 @@ public class Main {
 					this.columnHeaderArray = new ArrayList<String>();
 					this.columnHeaderArray.add("h");
 					this.columnHeaderArray.addAll(this.getAllColumnHeaders(root));
-//					this.columnHeaderArray = this.getAllColumnHeaders(root);
 					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
 					this.outputMap.put(root.getNodeName(), "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			}
@@ -493,7 +489,6 @@ public class Main {
 			this.columnHeaderArray = this.columnHeaderMap.get(root.getNodeName());
 			String[] columnValues = new String[this.columnHeaderArray.size()];
 			
-
 			// Align values with headers
 			for (int i = 0; i < this.columnHeaderArray.size(); i++) {
 				String columnHeader = this.columnHeaderArray.get(i);
@@ -538,7 +533,6 @@ public class Main {
 			}
 		}
 	}
-	
 
 	public boolean hasChildNodes(Node node) {
 		NodeList children = node.getChildNodes();
@@ -559,25 +553,6 @@ public class Main {
 			e.setValue(value + "</table>");
 		}
 	}
-
-	
-//	public static void allNodes(Node curr2){
-//		
-//		NodeList children = curr2.getChildNodes();
-//		Node curr; 
-//		
-//		for (int i =0; i<children.getLength(); i++) {
-//			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//				curr = children.item(i);
-//				System.out.println(String.format("%s: %-50s %s %s" , "child", curr.getNodeName(), "parent: ", curr.getParentNode().getNodeName() )) ;
-//				if(curr.hasChildNodes()){
-//					allNodes(curr);
-//				}
-//			}
-//		}	
-//	}
-
-	
 	
 	public void parseXsdTable(String path) {
 		File currentDir = new File(path);
@@ -606,8 +581,6 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-	
-	
 	
 	// input: Main.class schema.xsd file1.xml file2.xml...
 	public static void main(String[] args) {
