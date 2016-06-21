@@ -59,31 +59,6 @@ public class Main {
 			return false;
 		}
 	}
-	
-	public boolean validateXMLAgainstXSD(File xmlFile, File xsdFile) {
-		try {
-			Source xmlSource = new StreamSource(xmlFile);
-			SchemaFactory factory =
-					SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-					Schema schemaFactory = factory.newSchema(new StreamSource(xsdFile));
-					Validator validator = schemaFactory.newValidator();
-					validator.validate(xmlSource);
-					System.out.println(xmlFile.getName() + " has been validated against " + xsdFile.getName() + " successfully.");
-					return true;
-		} catch (SAXException e) {
-			e.printStackTrace();
-			System.out.println(xmlFile.getName() + " is NOT valid when checked against " + xsdFile.getName());
-			System.out.println("Reason: " + e.getLocalizedMessage());
-	
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("IOException when validating " + xmlFile.getName());
-			System.out.println("Reason: " + e.getLocalizedMessage());
-			return false;
-			
-		}
-	}
 
 	public void parseXML(File xmlFile) {
 
@@ -132,8 +107,6 @@ public class Main {
 						delimitOutput.append("\n\n" + "h\t" + ent.getKey() + "\n");
 						delimitOutput.append(ent.getValue().toString());
 					}
-//					System.out.print("\n" + ent.getKey() + "\n");
-//					System.out.println(ent.getValue().toString());
 				
 				}
 				
@@ -700,9 +673,9 @@ public class Main {
 						return;
 					}	
 				}
-				
+				XSDValidator validator = new XSDValidator();
 				for (File f: m.xmlFiles) {
-					if (!m.validateXMLAgainstXSD(f, xsdFile)) {
+					if (!validator.validateXMLAgainstXSD(f, xsdFile)) {
 						System.out.println("Validation failed for " + f.getName());
 						return;
 					}
