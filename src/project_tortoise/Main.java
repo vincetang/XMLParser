@@ -32,14 +32,12 @@ public class Main {
 	private String format = "-t";
 	private String delimitChar;
 	private ArrayList<File> xmlFiles;
-	private File xsdSchemaFile;
-	
+
 	private LinkedHashMap<String, String> outputMap;
 	private HashMap<String, String> tagValues;
 	private ArrayList<String> columnHeaderArray;
 	private HashMap<String, ArrayList<String>> columnHeaderMap;
 
-	
 	private XSDParser xsdParser;
 	
 	public boolean validateInput(String filename, String type) {
@@ -49,8 +47,6 @@ public class Main {
 		if (f.exists() && f.isFile()) {
 			if (type == "xml")
 				this.xmlFiles.add(f);
-			else
-				this.xsdSchemaFile = f;
 
 			return true;
 		} else {
