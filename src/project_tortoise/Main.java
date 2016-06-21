@@ -50,6 +50,7 @@ public class Main {
 
 			return true;
 		} else {
+			System.out.println(filename + " could not be found... skipping");
 			return false;
 		}
 	}
@@ -110,10 +111,13 @@ public class Main {
 					DateFormat dateFormat = new SimpleDateFormat("MMMdd_HHmmss");
 					Date date = new Date();
 					String strDate = dateFormat.format(date);
+					StringBuilder outFileName = new StringBuilder(this.outName + "_" + strDate);
 					if (this.format.equalsIgnoreCase("-c")) {
-						file = new File(this.outName + "_" + strDate + ".csv");
+						outFileName.append(".csv");
+						file = new File(outFileName.toString());
 					} else {
-						file = new File(this.outName + "_" + strDate + ".txt");
+						outFileName.append(".txt");
+						file = new File(outFileName.toString());
 					}
 
 					// if file doesnt exists, then create it
@@ -126,7 +130,7 @@ public class Main {
 					bw.write(delimitOutput.toString());
 					bw.close();
 
-					System.out.println("Done");
+					System.out.println("Done!\nOutput saved to " + outFileName);
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -684,9 +688,6 @@ public class Main {
 			m.parseXML(f);
 		}
 		
-		System.out.println("Complete");
-		
-
 		return;
 	}
 
