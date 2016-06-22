@@ -300,7 +300,7 @@ public class Main {
 			if (curr.getNodeName().equals("nullify_fields")){
 				nodeNames.addAll(getNullifiedFieldNames(curr));
 			} else if (curr.getNodeName().equals("udp_fields")) {
-				nodeNames.addAll(getUdpFieldNames(curr));
+				nodeNames.addAll(getUdpNameField(curr));
 			} else{
 				nodeNames.add(curr.getNodeName());
 			}
@@ -333,7 +333,7 @@ public class Main {
 		return fieldNames;
 	}
 	
-	public ArrayList<String> getUdpFieldNames (Node n) {
+	public ArrayList<String> getUdpNameField (Node n) {
 		ArrayList<Node> udpFields = getAllChildrenWithAttributes(n);
 		ArrayList<String> fieldNames = new ArrayList<String>();
 	
