@@ -301,8 +301,10 @@ public class Main {
 				nodeNames.addAll(getNullifiedFieldNames(curr));
 
 			} else if (curr.getNodeName().equals("udp_fields")) {
-				//nodeNames.addAll(getUdpNameField(curr));
-				getUdpMap(curr);
+//				nodeNames.addAll(getUdpNameField(curr));
+				HashMap<String, String> udpMap = (HashMap<String, String>) getUdpMap(curr);
+				nodeNames.addAll(0, udpMap.keySet());	
+				this.tagValues.putAll(udpMap);
 			} else{
 				//nodeNames.add(curr.getNodeName());
 				nodeNames.add(0, curr.getNodeName());
@@ -548,11 +550,9 @@ public class Main {
 			rootName = root.getNodeName();
 		}
 		
-		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {
+		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0 ||
+				root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {
 			// do nothing
-		} else if (root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {
-			HashMap<String, String> udpVals = (HashMap<String, String>) getUdpMap(root);
-			this.tagValues.putAll(udpVals);
 		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
 			
