@@ -301,7 +301,8 @@ public class Main {
 				nodeNames.addAll(getNullifiedFieldNames(curr));
 
 			} else if (curr.getNodeName().equals("udp_fields")) {
-				nodeNames.addAll(getUdpNameField(curr));
+				//nodeNames.addAll(getUdpNameField(curr));
+				getUdpMap(curr);
 			} else{
 				nodeNames.add(curr.getNodeName());
 			}
@@ -316,8 +317,8 @@ public class Main {
 		 * e.g.
 		 *<udp_fields>
           	<udp_field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="decimal_type" name="udefreceivercommissionrate">
-            <value>12.0000</value>
-          </udp_field>
+            	<value>12.0000</value>
+          	</udp_field>
           
           maps as {udefreceivercommissionrate: 12.0000}
 		 **/
@@ -337,6 +338,7 @@ public class Main {
 			udp_fields_map.put(key, value);
 		}
 		
+		System.out.println(udp_fields_map.toString());
 		return udp_fields_map;
 	}
 	
@@ -369,9 +371,12 @@ public class Main {
 	
 	public String getUdpFieldValue (Node n){
 		
-		ArrayList<Node> nullifiedFields = getSubNodesWithTextContent(n);
-		String udpValue;
-		return nullifiedFields.get(0).getTextContent();
+		ArrayList<Node> valueNodes = getSubNodesWithTextContent(n);
+		if (valueNodes.size() > 0){
+			return valueNodes.get(0).getTextContent();
+		} else {
+			return "";
+		}
 	}
 	
 	public ArrayList<String> getUdpNameField (Node n) {
