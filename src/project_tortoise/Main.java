@@ -534,7 +534,12 @@ public class Main {
 	}
 	
 	public void convertXmlToCsv(Node root) {
-		
+		String rootName;
+		if (root.getNodeName().compareToIgnoreCase("cnsmr_accnt_udp") == 0) { // generate a unique key for each consmr_accnt_udp
+			rootName = root.getNodeName() + root.getAttributes().getNamedItem("seq_no").toString();
+		} else {
+			rootName = root.getNodeName();
+		}
 		// root has no children
 		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0 || 
 				root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {//!this.hasChildNodes(root)) {
@@ -552,16 +557,19 @@ public class Main {
 				}
 			}
 			// If we haven't seen root type previously, create a key for it and insert the child tags as its values (first row)
-			if (!this.outputMap.containsKey(root.getNodeName())) {
+			if (!this.outputMap.containsKey(root.getNodeName()) || root.getNodeName().compareToIgnoreCase("cnsmr_accnt_udp") == 0) {
 					this.columnHeaderArray = new ArrayList<String>();
 					this.columnHeaderArray.add("h");
 					this.columnHeaderArray.addAll(this.getAllColumnHeaders(root));
-					this.columnHeaderMap.put(root.getNodeName(), this.columnHeaderArray);
-					this.outputMap.put(root.getNodeName(), "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+					
+
+					this.columnHeaderMap.put(rootName, this.columnHeaderArray);
+					this.outputMap.put(rootName, "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+					
 			}
 			
 			// Double check we have the right headers
-			this.columnHeaderArray = this.columnHeaderMap.get(root.getNodeName());
+			this.columnHeaderArray = this.columnHeaderMap.get(rootName);
 			String[] columnValues = new String[this.columnHeaderArray.size()];
 			
 			// Align values with headers
@@ -588,10 +596,10 @@ public class Main {
 			// Values of children tags (and fill nullified tags with "")
 			if (this.countValues(columnValues) > 1) { //countValues.size() > 0
 				//System.out.println(Arrays.toString(columnValues));
-				this.outputMap.put(root.getNodeName(), 
-						this.outputMap.get(root.getNodeName()) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+				this.outputMap.put(rootName, 
+						this.outputMap.get(rootName) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			} else {
-				this.outputMap.put(root.getNodeName(), this.outputMap.get(root.getNodeName()) + "" + "\n");
+				this.outputMap.put(rootName, this.outputMap.get(rootName) + "" + "\n");
 			}
 
 			// reset values/tags
