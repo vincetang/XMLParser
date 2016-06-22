@@ -299,9 +299,15 @@ public class Main {
 			curr = nodes.get(i);
 			if (curr.getNodeName().equals("nullify_fields")){
 				nodeNames.addAll(getNullifiedFieldNames(curr));
+<<<<<<< HEAD
 			} else if (curr.getNodeName().equals("udp_fields")){
 				getUdpMap(curr);
 			} else {
+=======
+			} else if (curr.getNodeName().equals("udp_fields")) {
+				nodeNames.addAll(getUdpNameField(curr));
+			} else{
+>>>>>>> 1a352436fe4d5c4b592eabb5527a90f722de6be9
 				nodeNames.add(curr.getNodeName());
 			}
 		}
@@ -365,6 +371,7 @@ public class Main {
 		return fieldNames;
 	}
 	
+<<<<<<< HEAD
 	
 	public String getUdpFieldValue (Node n){
 		
@@ -373,6 +380,21 @@ public class Main {
 		return nullifiedFields.get(0).getTextContent();
 	}
 	
+=======
+	public ArrayList<String> getUdpNameField (Node n) {
+		ArrayList<Node> udpFields = getAllChildrenWithAttributes(n);
+		ArrayList<String> fieldNames = new ArrayList<String>();
+	
+		for (int i = 0; i < udpFields.size(); i ++ ) {
+			NamedNodeMap attributes = udpFields.get(i).getAttributes();
+			String att = attributes.getNamedItem("name").toString();
+			fieldNames.add(att);
+		}
+		return fieldNames;
+	}
+	
+
+>>>>>>> 1a352436fe4d5c4b592eabb5527a90f722de6be9
 	public static ArrayList<Node> getSubNodesWithTextContent(Node node){
 		ArrayList<Node> subNodesTextContent = new ArrayList<Node>();
 		ArrayList<Node> childrenTextContent = new ArrayList<Node>();
@@ -460,6 +482,17 @@ public class Main {
 		return attChildren;
 	}
 	
+	public static ArrayList<Node> getAllChildrenWithAttributes(Node node) {
+		NodeList children = node.getChildNodes();
+		ArrayList<Node> attChildren = new ArrayList<Node>();
+		
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).hasAttributes()) {
+				attChildren.add(children.item(i));
+			}
+		}
+		return attChildren;
+	}
 	
 	public static ArrayList<Node> getElementChildNodes(Node node) {
 		//return ArrayList<Node> children that are elements
@@ -485,7 +518,7 @@ public class Main {
 			tags.add(nodeAttributes.item(i).getNodeName());
 		}
 		
-		// get children tags (including nullified
+		// get children tags (including nullified and UDP fields)
 		tags.addAll(this.getCnsmrNodeNames(node));
 
 		return tags;
@@ -511,7 +544,8 @@ public class Main {
 	public void convertXmlToCsv(Node root) {
 		
 		// root has no children
-		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {//!this.hasChildNodes(root)) {
+		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0 || 
+				root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {//!this.hasChildNodes(root)) {
 			// do nothing
 		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
