@@ -304,7 +304,8 @@ public class Main {
 				//nodeNames.addAll(getUdpNameField(curr));
 				getUdpMap(curr);
 			} else{
-				nodeNames.add(curr.getNodeName());
+				//nodeNames.add(curr.getNodeName());
+				nodeNames.add(0, curr.getNodeName());
 			}
 		}
 		return nodeNames;
@@ -509,7 +510,7 @@ public class Main {
 		// Returns all of a node's attribute tags, child tags, and nullified tags
 		ArrayList<String> tags = new ArrayList<String>();
 		NamedNodeMap nodeAttributes = node.getAttributes();
-		
+
 		// get attributes
 		for (int i = 0; i < nodeAttributes.getLength(); i++) {
 			tags.add(nodeAttributes.item(i).getNodeName());
