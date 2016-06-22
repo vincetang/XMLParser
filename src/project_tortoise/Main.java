@@ -542,13 +542,16 @@ public class Main {
 		String rootName;
 		if (root.getNodeName().compareToIgnoreCase("cnsmr_accnt_udp") == 0) { // generate a unique key for each consmr_accnt_udp
 			rootName = root.getNodeName() + root.getAttributes().getNamedItem("seq_no").toString();
+			
 		} else {
 			rootName = root.getNodeName();
 		}
-		// root has no children
-		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0 || 
-				root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {//!this.hasChildNodes(root)) {
+		
+		if (root.getNodeName().compareToIgnoreCase("nullify_fields") == 0) {
 			// do nothing
+		} else if (root.getNodeName().compareToIgnoreCase("udp_fields") == 0) {
+			HashMap<String, String> udpVals = (HashMap<String, String>) getUdpMap(root);
+			this.tagValues.putAll(udpVals);
 		} else { // root has children
 			ArrayList<Node> children = getElementChildNodes(root);
 			
