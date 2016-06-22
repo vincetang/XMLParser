@@ -299,15 +299,10 @@ public class Main {
 			curr = nodes.get(i);
 			if (curr.getNodeName().equals("nullify_fields")){
 				nodeNames.addAll(getNullifiedFieldNames(curr));
-<<<<<<< HEAD
-			} else if (curr.getNodeName().equals("udp_fields")){
-				getUdpMap(curr);
-			} else {
-=======
+
 			} else if (curr.getNodeName().equals("udp_fields")) {
 				nodeNames.addAll(getUdpNameField(curr));
 			} else{
->>>>>>> 1a352436fe4d5c4b592eabb5527a90f722de6be9
 				nodeNames.add(curr.getNodeName());
 			}
 		}
@@ -371,7 +366,6 @@ public class Main {
 		return fieldNames;
 	}
 	
-<<<<<<< HEAD
 	
 	public String getUdpFieldValue (Node n){
 		
@@ -380,7 +374,6 @@ public class Main {
 		return nullifiedFields.get(0).getTextContent();
 	}
 	
-=======
 	public ArrayList<String> getUdpNameField (Node n) {
 		ArrayList<Node> udpFields = getAllChildrenWithAttributes(n);
 		ArrayList<String> fieldNames = new ArrayList<String>();
@@ -394,7 +387,6 @@ public class Main {
 	}
 	
 
->>>>>>> 1a352436fe4d5c4b592eabb5527a90f722de6be9
 	public static ArrayList<Node> getSubNodesWithTextContent(Node node){
 		ArrayList<Node> subNodesTextContent = new ArrayList<Node>();
 		ArrayList<Node> childrenTextContent = new ArrayList<Node>();
