@@ -299,11 +299,44 @@ public class Main {
 			curr = nodes.get(i);
 			if (curr.getNodeName().equals("nullify_fields")){
 				nodeNames.addAll(getNullifiedFieldNames(curr));
+			} else if (curr.getNodeName().equals("udp_fields")){
+				getUdpMap(curr);
 			} else {
 				nodeNames.add(curr.getNodeName());
 			}
 		}
 		return nodeNames;
+	}
+	
+	public Map<String, String> getUdpMap(Node udp_fields){
+		Map<String, String> udp_fields_map = new HashMap<String,String>();
+		
+		/**
+		 * e.g.
+		 *<udp_fields>
+          	<udp_field xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="decimal_type" name="udefreceivercommissionrate">
+            <value>12.0000</value>
+          </udp_field>
+          
+          maps as {udefreceivercommissionrate: 12.0000}
+		 **/
+		
+		ArrayList<Node> udps = getSubNodesWithAttributes(udp_fields);
+		Node curr;
+		String key; 
+		String value;
+		for(int i=0; i<udps.size(); i++){
+			curr = udps.get(i);
+			//get "name" attribute 
+			key = getAttValue(curr, "name");
+			
+			// get value
+			value = getUdpFieldValue(curr);
+			
+			udp_fields_map.put(key, value);
+		}
+		
+		return udp_fields_map;
 	}
 	
 	
@@ -312,8 +345,9 @@ public class Main {
 		ArrayList<Node> textChildren = new ArrayList<Node>();
 		
 		for (int i = 0; i < children.size(); i++) {
-			if (!children.get(i).getTextContent().isEmpty() && 
-				!children.get(i).getNodeName().equalsIgnoreCase("udp_field")) {
+			if (!children.get(i).getTextContent().isEmpty() 
+//					&& !children.get(i).getNodeName().equalsIgnoreCase("udp_field")
+				) {
 				textChildren.add(children.get(i));
 			}
 		}
@@ -329,6 +363,14 @@ public class Main {
 			fieldNames.add(nullifiedFields.get(i).getTextContent());
 		}
 		return fieldNames;
+	}
+	
+	
+	public String getUdpFieldValue (Node n){
+		
+		ArrayList<Node> nullifiedFields = getSubNodesWithTextContent(n);
+		String udpValue;
+		return nullifiedFields.get(0).getTextContent();
 	}
 	
 	public static ArrayList<Node> getSubNodesWithTextContent(Node node){
@@ -357,6 +399,11 @@ public class Main {
 
 	public String cnsmrType(Node n){
 		return n.getAttributes().getNamedItem("type").getNodeValue();
+	}
+	
+	//node, attribute name -> returns attribute value
+	public String getAttValue(Node n, String attName){
+		return n.getAttributes().getNamedItem(attName).getNodeValue();
 	}
 	
 	
@@ -404,7 +451,9 @@ public class Main {
 		ArrayList<Node> attChildren = new ArrayList<Node>();
 		
 		for (int i = 0; i < children.getLength(); i++) {
-			if (children.item(i).hasAttributes() && !children.item(i).getNodeName().equalsIgnoreCase("udp_field")) {
+			if (children.item(i).hasAttributes() 
+//					&& !children.item(i).getNodeName().equalsIgnoreCase("udp_field")
+					) {
 				attChildren.add(children.item(i));
 			}
 		}
