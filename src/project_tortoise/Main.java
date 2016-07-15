@@ -544,7 +544,7 @@ public class Main {
 	public void convertXmlToCsv(Node root) {
 		String rootName;
 		if (root.getNodeName().compareToIgnoreCase("cnsmr_accnt_udp") == 0) { // generate a unique key for each consmr_accnt_udp
-			rootName = root.getNodeName() + root.getAttributes().getNamedItem("seq_no").toString();
+			rootName = root.getNodeName() + " " + root.getAttributes().getNamedItem("seq_no").getNodeValue().toString();
 			
 		} else {
 			rootName = root.getNodeName();
@@ -573,7 +573,13 @@ public class Main {
 					
 
 					this.columnHeaderMap.put(rootName, this.columnHeaderArray);
-					this.outputMap.put(rootName, "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+					StringBuilder headerString = new StringBuilder();
+					for (String s : this.columnHeaderArray) {
+						headerString.append(s);
+						headerString.append(this.delimitChar);
+					}
+					this.outputMap.put(rootName, "\n" + headerString + "\n");
+//					this.outputMap.put(rootName, "\n" + this.columnHeaderArray.toString().replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 					
 			}
 			
@@ -605,8 +611,14 @@ public class Main {
 			// Values of children tags (and fill nullified tags with "")
 			if (this.countValues(columnValues) > 1) { //countValues.size() > 0
 				//System.out.println(Arrays.toString(columnValues));
-				this.outputMap.put(rootName, 
-						this.outputMap.get(rootName) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
+				StringBuilder valueString = new StringBuilder();
+				for (String s : columnValues) {
+					valueString.append(s);
+					valueString.append(this.delimitChar);
+				}
+				this.outputMap.put(rootName, this.outputMap.get(rootName) + valueString + "\n");
+//				this.outputMap.put(rootName, 
+//						this.outputMap.get(rootName) + Arrays.toString(columnValues).replace("[", "").replace("]", "").replace(",", this.delimitChar) + "\n");
 			} else {
 				this.outputMap.put(rootName, this.outputMap.get(rootName) + "" + "\n");
 			}
