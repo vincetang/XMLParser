@@ -694,13 +694,13 @@ public class Main {
 		String help =
 				"Parser Help\n=========\n"
 				+ "Commands:\n"
-				+ "XMLParser parseXSDTable [filepath]\n"
+				+ "parseXSDTable [filepath]\n"
 				+ "\tBuilds a table of all xsd elements in the filepath specified (including subdirectories) or the current directory if a filepath is not specified.\n"
-				+ "XMLParser [-h,-c] file1.xml file2.xml...\n"
+				+ "\n[-h,-c] file1.xml file2.xml...\n"
 				+ "\tno argument: generate tab-delimited representation of files\n"
 				+ "\th: generate HTML representation of files\n"
 				+ "\tc: generate comma-separated representation of files\n"
-				+ "XMLParser -v schema.xsd file1.xml file2.xml...\n"
+				+ "\n-v schema.xsd file1.xml file2.xml...\n"
 				+ "\tv: validates each xml file against the xsd schema\n";
 
 		if (args.length == 0 || args[0].compareToIgnoreCase("help") == 0) {
